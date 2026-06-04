@@ -13,15 +13,12 @@ import { startRecording, cleanupRecording } from './modules/recording.js';
 import { getCanvasDimensions, resizeCanvas, cleanup, drawFrame, animate, stopAnimation, renderSnapshot, updateNFTCenters, initParticlesOnce, cloneParticles, hashStringToInt, seededRandomFloat, createParticleCache } from './modules/visualizer.js';
 import { apiFetch } from './modules/api.js';
 
-// LABOJUMS SONARCLOUD: Izmantojam relatīvo ceļu, lai novērstu "absolute path" brīdinājumu
 import { ADDON_STYLES } from './themes.js';
 
-// Izveido App objektu ar visu stāvokli
 const App = Object.assign({}, AppState, {
   setAddonStyle(styleName) {
     this.currentAddonStyle = styleName;
     
-    // Izmantojam lokāli importēto ADDON_STYLES moduli, nevis window globāli
     const style = ADDON_STYLES[styleName];
     if (!style) return;
 
@@ -145,7 +142,7 @@ const App = Object.assign({}, AppState, {
     }
     
     setButtonLoading(UI.generateNFTBtn, true);
-    showToast('📸 Preparing image for Lighthouse SDK...', 'info');
+    showToast('📸 Preparing image for Lighthouse...', 'info');
     
     try {
       const imageResult = await uploadImageToIPFS(UI.canvas);
@@ -157,7 +154,7 @@ const App = Object.assign({}, AppState, {
         videoResult = await uploadVideoToIPFS(stream, 15000); 
         this.lastVideoURL = videoResult; 
       } catch (error) { 
-        console.warn('Video upload to Lighthouse SDK failed:', error); 
+        console.warn('Video upload failed:', error); 
         showToast('🎬 Video upload failed, continuing without video', 'warning');
       }
       
@@ -198,13 +195,16 @@ const App = Object.assign({}, AppState, {
       showIPFSPreview(imageResult, videoResult, metadataResult);
       showToast('📝 Preparing mint transaction...', 'info');
       
+      // 🔐 Sūtam hash vērtības uz mint API
       let mintData;
       try {
         const mintRes = await apiFetch('/api/mint-with-signature', {
           method: 'POST',
           body: JSON.stringify({
             wallet: this.account,
-            metadataUri: metadataResult.cid || metadataResult.ipfs
+            metadataUri: metadataResult.cid || metadataResult.ipfs,
+            imageHash: imageResult.hash || null,
+            videoHash: videoResult?.hash || null
           })
         });
         
@@ -234,9 +234,9 @@ const App = Object.assign({}, AppState, {
       showToast('⏳ Transaction submitted, waiting for confirmation...', 'info');
       
       await signedTx.wait();
-      showToast('✅ NFT minted successfully via Lighthouse SDK!', 'success');
+      showToast('✅ NFT minted successfully via Lighthouse!', 'success');
       
-      alert(`✅ NFT minted successfully!\n\nTransaction hash: ${signedTx.hash}\nMint price: ${ethers.formatEther(mintData.transaction.value)} ETH\nCID: ${metadataResult.cid}\nSource chain: ${this.currentVizChain}\nView on Lighthouse: ${LIGHTHOUSE_GATEWAY}${metadataResult.cid}`);
+      alert(`✅ NFT minted successfully!\n\nTransaction hash: ${signedTx.hash}\nMint price: ${ethers.formatEther(mintData.transaction.value)} ETH\nCID: ${metadataResult.cid}\nImage Hash: ${imageResult.hash}\nVideo Hash: ${videoResult?.hash || 'N/A'}\nSource chain: ${this.currentVizChain}\nView on Lighthouse: ${LIGHTHOUSE_GATEWAY}${metadataResult.cid}`);
       
     } catch (error) {
       console.error(error);
@@ -288,7 +288,7 @@ const App = Object.assign({}, AppState, {
   },
 
   init() {
-    console.log("🚀 Starting Wallet Visualizer with Lighthouse SDK Storage...");
+    console.log("🚀 Starting Wallet Visualizer with Lighthouse Storage...");
     initUI();
     resizeCanvas(this);
     
@@ -339,7 +339,7 @@ const App = Object.assign({}, AppState, {
     window.LOW_POWER_MODE = LOW_POWER_MODE;
     
     showToast('✨ Welcome! Connect your wallet to begin.', 'info');
-    console.log('✅ Wallet Visualizer Ready with Lighthouse SDK Storage!');
+    console.log('✅ Wallet Visualizer Ready with Lighthouse Storage!');
   }
 });
 
