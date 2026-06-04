@@ -16,50 +16,74 @@ export async function onRequestPost(context) {
       });
     }
 
-    const rateKey = `upload-metadata:${user.address}`;
+    const rateKey = `upload-metadata:${user.address.toLowerCase()}`;
     if (!(await checkRateLimit({ key: rateKey, limit: 5, windowMs: 60000 }, env))) {
-      return new Response(JSON.stringify({ error: 'Too many requests. Try again later.' }), {
+      return new Response(JSON.stringify({ error: 'Too many metadata uploads. Try again later.' }), {
         status: 429,
         headers: { "Content-Type": "application/json" }
       });
     }
 
-    let metadata;
+    let body;
     try {
-      metadata = await request.json();
+      body = await request.json();
     } catch (e) {
-      return new Response(JSON.stringify({ error: "Invalid JSON metadata" }), {
+      return new Response(JSON.stringify({ error: 'Invalid JSON format' }), {
         status: 400,
         headers: { "Content-Type": "application/json" }
       });
     }
 
-    if (!metadata || Object.keys(metadata).length === 0) {
-      return new Response(JSON.stringify({ error: "Metadata object cannot be empty" }), {
+    let metadata = body;
+    if (metadata.metadata && !metadata.name) {
+      metadata = metadata.metadata;
+    }
+
+    if (!metadata || !metadata.name || !metadata.image) {
+      return new Response(JSON.stringify({ error: 'Metadata must contain name and image' }), {
         status: 400,
         headers: { "Content-Type": "application/json" }
       });
     }
 
-    if (!env.LIGHTHOUSE_API_KEY) {
-      return new Response(JSON.stringify({ error: 'Server configuration error: Missing LIGHTHOUSE_API_KEY' }), {
-        status: 500,
+    if (typeof metadata.name !== 'string' || metadata.name.length > 100) {
+      return new Response(JSON.stringify({ error: 'Invalid name (max 100 characters)' }), {
+        status: 400,
+        headers: { "Content-Type": "application/json" }
+      });
+    }
+    if (typeof metadata.image !== 'string' || metadata.image.length > 500) {
+      return new Response(JSON.stringify({ error: 'Invalid image URL' }), {
+        status: 400,
+        headers: { "Content-Type": "application/json" }
+      });
+    }
+    if (!/^(https?|ipfs):\/\/.+/.test(metadata.image)) {
+      return new Response(JSON.stringify({ error: 'Image must be a valid HTTP/HTTPS or IPFS URL' }), {
+        status: 400,
         headers: { "Content-Type": "application/json" }
       });
     }
 
-    console.log(`🚀 Augšupielādējam metadatus caur Lighthouse SDK (storageType: LIFETIME)...`);
+    const allowedFields = ['name', 'image', 'description', 'attributes', 'animation_url'];
+    for (const key of Object.keys(metadata)) {
+      if (!allowedFields.includes(key)) {
+        delete metadata[key];
+      }
+    }
+
+    console.log(`🚀 Augšupielādējam metadatus caur Lighthouse SDK (Annual Storage)...`);
 
     const jsonString = JSON.stringify(metadata);
     const buffer = Buffer.from(jsonString, 'utf-8');
 
-    // ✅ SVARĪGI: storageType kā 5. arguments (pēc encrypt=false, encryptionParams=null)
+    // ✅ Izmantojam Lighthouse SDK ar storageType
     const uploadResponse = await lighthouse.uploadBuffer(
       buffer,
       env.LIGHTHOUSE_API_KEY,
-      false,  // encrypt
-      null,   // encryptionParams
-      { storageType: "lifetime" }  // <-- OPTIONS OBJEKTS AR storageType
+      false,
+      null,
+      { storageType: "annual" }
     );
 
     const cid = uploadResponse?.data?.Hash || uploadResponse?.Hash;
@@ -69,10 +93,9 @@ export async function onRequestPost(context) {
       throw new Error('No CID returned for metadata from Lighthouse SDK');
     }
 
-    console.log(`✅ Metadati veiksmīgi augšupielādēti ar LIFETIME plānu! CID: ${cid}`);
+    console.log(`✅ Metadati veiksmīgi augšupielādēti! CID: ${cid}`);
 
-    const lastUploadKey = `lastUploadCID:${user.address.toLowerCase()}`;
-    await setCache(lastUploadKey, cid, env, 5 * 60 * 1000);
+    await setCache(`lastUploadCID:${user.address.toLowerCase()}`, cid, env, 5 * 60 * 1000);
 
     return new Response(JSON.stringify({
       ipfs: `ipfs://${cid}`,
