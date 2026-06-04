@@ -1,5 +1,6 @@
 import { requireAuth } from "../_lib/auth.js";
 import { checkRateLimit } from "../_lib/rateLimit.js";
+import lighthouse from '@lighthouse-web3/sdk';
 import crypto from 'crypto';
 
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'video/mp4', 'video/webm'];
@@ -59,7 +60,7 @@ export async function onRequestPost(context) {
       });
     }
 
-    console.log(`🚀 Augšupielādējam failu uz Lighthouse API (Annual Storage)...`);
+    console.log(`🚀 Augšupielādējam failu caur Lighthouse SDK (Annual Storage)...`);
 
     const arrayBuffer = await fileEntry.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
@@ -67,30 +68,20 @@ export async function onRequestPost(context) {
     // 🔐 Aprēķina SHA256 hash no faila baitiem
     const fileHash = '0x' + crypto.createHash('sha256').update(buffer).digest('hex');
 
-    const customFormData = new FormData();
-    customFormData.append('file', new Blob([buffer], { type: contentType }), fileEntry.name);
+    // ✅ Izmantojam Lighthouse SDK ar storageType
+    const uploadResponse = await lighthouse.uploadBuffer(
+      buffer,
+      env.LIGHTHOUSE_API_KEY,
+      false,
+      null,
+      { storageType: "annual" }
+    );
 
-    const response = await fetch('https://api.lighthouse.storage/api/v0/upload', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${env.LIGHTHOUSE_API_KEY}`,
-        'X-Storage-Type': 'annual'
-      },
-      body: customFormData
-    });
-
-    const result = await response.json();
-    
-    if (!response.ok) {
-      console.error("Lighthouse API kļūda:", result);
-      throw new Error(`Lighthouse API error: ${response.status}`);
-    }
-
-    const cid = result?.data?.Hash || result?.Hash;
+    const cid = uploadResponse?.data?.Hash || uploadResponse?.Hash;
 
     if (!cid) {
-      console.error("Lighthouse API atbilde:", JSON.stringify(result));
-      throw new Error("Neizdevās iegūt CID no Lighthouse API");
+      console.error("Lighthouse SDK atbilde:", JSON.stringify(uploadResponse));
+      throw new Error("Neizdevās iegūt CID no Lighthouse SDK");
     }
 
     console.log(`✅ Fails veiksmīgi augšupielādēts! CID: ${cid}, Hash: ${fileHash}`);
@@ -106,7 +97,7 @@ export async function onRequestPost(context) {
     });
 
   } catch (error) {
-    console.error('💥 Lighthouse kļūda:', error);
+    console.error('💥 Lighthouse SDK kļūda:', error);
     return new Response(JSON.stringify({ error: error.message }), {
       status: 500,
       headers: { "Content-Type": "application/json" }
