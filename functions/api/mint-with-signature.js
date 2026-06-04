@@ -4,7 +4,7 @@ import { checkRateLimit } from "../_lib/rateLimit.js";
 import { getCache, deleteCache } from "../_lib/cache.js";
 
 const WALLET_NFT_ABI = [
-  "function mintWithSignature(address wallet, string calldata metadataUri, uint256 nonceParam, bytes calldata signature) external payable",
+  "function mintWithSignature(address wallet, string calldata metadataUri, bytes32 imageHash, bytes32 videoHash, uint256 nonceParam, bytes calldata signature) external payable",
   "function mintPrice() public view returns (uint256)",
   "function getNonce(address wallet) public view returns (uint256)"
 ];
@@ -37,7 +37,7 @@ export async function onRequestPost(context) {
       });
     }
 
-    const { wallet, metadataUri } = body;
+    const { wallet, metadataUri, imageHash, videoHash } = body;
     if (!wallet || !metadataUri || !ethers.isAddress(wallet)) {
       return new Response(JSON.stringify({ success: false, error: 'Invalid input' }), {
         status: 400, headers: { "Content-Type": "application/json" }
@@ -49,6 +49,14 @@ export async function onRequestPost(context) {
         status: 403, headers: { "Content-Type": "application/json" }
       });
     }
+
+    // Validē hash formātu (0x + 64 hex chars) vai ZeroHash
+    const finalImageHash = imageHash && /^0x[0-9a-fA-F]{64}$/.test(imageHash) 
+      ? imageHash 
+      : ethers.ZeroHash;
+    const finalVideoHash = videoHash && /^0x[0-9a-fA-F]{64}$/.test(videoHash) 
+      ? videoHash 
+      : ethers.ZeroHash;
 
     // Notīrām CID no jebkādiem prefiksiem
     let cleanMetadataCID = metadataUri.trim();
@@ -100,7 +108,7 @@ export async function onRequestPost(context) {
       });
     }
 
-    // 🌟 Izveidojam tiešo HTTPS saiti caur mūsu dedikēto Lighthouse gateway
+    // 🌟 Izveidojam tiešo HTTPS saiti caur Lighthouse gateway
     const fullIpfsUri = `https://meaningful-macaw-y3g2r.lighthouseweb3.xyz/ipfs/${cleanMetadataCID}`;
     const serverWallet = new ethers.Wallet(SERVER_PRIVATE_KEY);
 
@@ -115,6 +123,8 @@ export async function onRequestPost(context) {
       MintRequest: [
         { name: 'wallet', type: 'address' },
         { name: 'metadataUri', type: 'string' },
+        { name: 'imageHash', type: 'bytes32' },
+        { name: 'videoHash', type: 'bytes32' },
         { name: 'nonce', type: 'uint256' }
       ]
     };
@@ -122,13 +132,22 @@ export async function onRequestPost(context) {
     const value = {
       wallet: wallet,
       metadataUri: fullIpfsUri,
+      imageHash: finalImageHash,
+      videoHash: finalVideoHash,
       nonce: currentNonce
     };
 
     const signature = await serverWallet.signTypedData(domain, types, value);
 
     const iface = new ethers.Interface(WALLET_NFT_ABI);
-    const data = iface.encodeFunctionData('mintWithSignature', [wallet, fullIpfsUri, currentNonce, signature]);
+    const data = iface.encodeFunctionData('mintWithSignature', [
+      wallet, 
+      fullIpfsUri, 
+      finalImageHash, 
+      finalVideoHash, 
+      currentNonce, 
+      signature
+    ]);
 
     let estimatedGas;
     try {
@@ -150,7 +169,9 @@ export async function onRequestPost(context) {
         data: data,
         value: mintPrice.toString(),
         gasLimit: estimatedGas.toString()
-      }
+      },
+      imageHash: finalImageHash !== ethers.ZeroHash ? finalImageHash : null,
+      videoHash: finalVideoHash !== ethers.ZeroHash ? finalVideoHash : null
     }), {
       status: 200, headers: { "Content-Type": "application/json" }
     });
