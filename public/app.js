@@ -177,13 +177,8 @@ const App = Object.assign({}, AppState, {
           const chunks = [];
           
           recorder.ondataavailable = (e) => { if (e.data && e.data.size) chunks.push(e.data); };
-          recorder.onstop = () => {
-            const blob = new Blob(chunks, { type: mimeType });
-            resolve(blob);
-          };
-          recorder.onerror = (event) => {
-            reject(event?.error || new Error('Recording failed'));
-          };
+          recorder.onstop = () => resolve(new Blob(chunks, { type: mimeType }));
+          recorder.onerror = (event) => reject(event?.error || new Error('Recording failed'));
           
           recorder.start(1000);
           setTimeout(() => { if (recorder.state === 'recording') recorder.stop(); }, 15000);
@@ -192,34 +187,60 @@ const App = Object.assign({}, AppState, {
         const videoExt = videoBlob.type === 'video/mp4' ? 'mp4' : 'webm';
         videoFileName = `video_${Date.now()}.${videoExt}`;
         videoFile = new File([videoBlob], videoFileName, { type: videoBlob.type });
-        
-        showToast('🎬 Video recorded successfully!', 'success');
+        showToast('🎬 Video recorded!', 'success');
       } catch (error) {
         console.warn('Video recording failed:', error);
-        showToast('🎬 Video recording failed, continuing without video', 'warning');
+        showToast('🎬 Video failed, continuing without video', 'warning');
       }
       
       // =============================================
-      // 3. 🔐 APRĒĶINA HASH NO LOKĀLAJIEM FAILIEM
+      // 3. 💾 LEJUPIELĀDĒ VISUS FAILUS UZREIZ
       // =============================================
-      showToast('🔐 Calculating hashes from local files...', 'info');
+      showToast('💾 Saving files to your computer...', 'info');
       
-      const localImageHash = await calculateHashFromBlob(imageBlob);
-      console.log('🔐 Local Image Hash:', localImageHash);
+      downloadFile(imageBlob, imageFileName);
+      if (videoBlob && videoFileName) downloadFile(videoBlob, videoFileName);
       
-      let localVideoHash = null;
-      if (videoBlob) {
-        localVideoHash = await calculateHashFromBlob(videoBlob);
-        console.log('🔐 Local Video Hash:', localVideoHash);
+      showToast('✅ Files saved locally!', 'success');
+      
+      // =============================================
+      // 4. 📤 SŪTA UZ SERVERI (PREPARE-NFT)
+      // =============================================
+      showToast('📤 Processing on server...', 'info');
+      
+      const nftFormData = new FormData();
+      nftFormData.append('image', imageFile);
+      if (videoFile) nftFormData.append('video', videoFile);
+      
+      const authToken = localStorage.getItem("auth_token");
+      const reqHeaders = authToken ? { "Authorization": `Bearer ${authToken}` } : {};
+      
+      const serverRes = await fetch('/api/prepare-nft', {
+        method: 'POST',
+        headers: reqHeaders,
+        body: nftFormData
+      });
+      
+      if (!serverRes.ok) {
+        const errText = await serverRes.text().catch(() => 'Unknown error');
+        throw new Error(`Server error: ${serverRes.status} ${errText}`);
       }
       
+      const serverData = await serverRes.json();
+      if (!serverData.success) throw new Error(serverData.error || 'Processing failed');
+      
+      console.log('✅ Serveris apstrādāja:', serverData);
+      
       // =============================================
-      // 4. 📄 IZVEIDO METADATUS
+      // 5. 📄 IZVEIDO METADATUS
       // =============================================
+      const gw = LIGHTHOUSE_GATEWAY;
+      const imageUrl = serverData.image.cid ? `${gw}${serverData.image.cid}` : `local://${serverData.image.hash}`;
+      
       const metadata = {
         name: "Wallet Visualization NFT",
         description: `Generated from wallet ${this.account} on ${new Date().toISOString()}`,
-        image: `${LIGHTHOUSE_GATEWAY}PLACEHOLDER`,
+        image: imageUrl,
         attributes: [
           { trait_type: "ETH Balance", value: this.ethBalance.toString() },
           { trait_type: "Token Count", value: this.tokens.length.toString() },
@@ -230,160 +251,85 @@ const App = Object.assign({}, AppState, {
         ]
       };
       
+      if (serverData.video?.cid) metadata.animation_url = `${gw}${serverData.video.cid}`;
+      
       const metadataBlob = new Blob([JSON.stringify(metadata, null, 2)], { type: 'application/json' });
       const metadataFileName = `metadata_${Date.now()}.json`;
-      
-      // =============================================
-      // 5. 💾 LEJUPIELĀDĒ VISUS FAILUS
-      // =============================================
-      showToast('💾 Downloading files to your computer...', 'info');
-      
-      downloadFile(imageBlob, imageFileName);
-      
-      if (videoBlob && videoFileName) {
-        downloadFile(videoBlob, videoFileName);
-      }
-      
       downloadFile(metadataBlob, metadataFileName);
       
-      showToast('✅ All files saved to your computer!', 'success');
-      
       // =============================================
-      // 6. 📤 AUGŠUPIELĀDĒ UZ LIGHTHOUSE
+      // 6. 📤 METADATI UZ LIGHTHOUSE (ja iespējams)
       // =============================================
-      showToast('📤 Uploading to Lighthouse...', 'info');
-      
-      const imageResult = await uploadFileToIPFS(imageFile);
-      this.lastImageURL = imageResult;
-      
-      let videoResult = null;
-      if (videoFile) {
-        try {
-          videoResult = await uploadFileToIPFS(videoFile);
-          this.lastVideoURL = videoResult;
-        } catch (error) {
-          console.warn('Video upload to Lighthouse failed:', error);
-          showToast('🎬 Video upload failed, continuing without video', 'warning');
-        }
+      let metadataCID = null;
+      try {
+        const metaRes = await uploadMetadataToIPFS(metadata);
+        metadataCID = metaRes.cid || metaRes.ipfs;
+        showToast('✅ Metadata uploaded to Lighthouse!', 'success');
+      } catch (e) {
+        console.warn('Metadata upload failed:', e);
+        showToast('⚠️ Metadata upload failed, continuing anyway', 'warning');
       }
       
       // =============================================
-      // 7. ✅ SALĪDZINA HASH
+      // 7. ⛓️ MINT NFT
       // =============================================
-      if (localImageHash !== imageResult.hash) {
-        throw new Error('❌ CRITICAL: Image hash mismatch! Local vs Lighthouse');
-      }
-      console.log('✅ Image hash verified:', localImageHash);
+      showToast('📝 Preparing mint...', 'info');
       
-      if (videoResult && localVideoHash && localVideoHash !== videoResult.hash) {
-        throw new Error('❌ CRITICAL: Video hash mismatch! Local vs Lighthouse');
-      }
-      if (videoResult && localVideoHash) {
-        console.log('✅ Video hash verified:', localVideoHash);
-      }
-      
-      // =============================================
-      // 8. 📄 ATJAUNINA METADATUS AR ĪSTO CID
-      // =============================================
-      let cleanImageCID = imageResult.cid || imageResult.ipfs;
-      if (cleanImageCID && cleanImageCID.startsWith('ipfs://')) {
-        cleanImageCID = cleanImageCID.substring(7);
-      }
-      
-      let cleanVideoCID = null;
-      if (videoResult && (videoResult.cid || videoResult.ipfs)) {
-        cleanVideoCID = videoResult.cid || videoResult.ipfs;
-        if (cleanVideoCID && cleanVideoCID.startsWith('ipfs://')) {
-          cleanVideoCID = cleanVideoCID.substring(7);
-        }
-      }
-      
-      metadata.image = `${LIGHTHOUSE_GATEWAY}${cleanImageCID}`;
-      if (videoResult && cleanVideoCID) {
-        metadata.animation_url = `${LIGHTHOUSE_GATEWAY}${cleanVideoCID}`;
-      }
-      
-      const metadataResult = await uploadMetadataToIPFS(metadata);
-      this.lastMetadataURL = metadataResult;
-      
-      // =============================================
-      // 9. 👁️ PARĀDA PRIEKŠSKATĪJUMU
-      // =============================================
-      showIPFSPreview(imageResult, videoResult, metadataResult);
-      showToast('📝 Preparing mint transaction...', 'info');
-      
-      // =============================================
-      // 10. ⛓️ MINT NFT
-      // =============================================
       let mintData;
       try {
         const mintRes = await apiFetch('/api/mint-with-signature', {
           method: 'POST',
           body: JSON.stringify({
             wallet: this.account,
-            metadataUri: metadataResult.cid || metadataResult.ipfs,
-            imageHash: imageResult.hash || null,
-            videoHash: videoResult?.hash || null
+            metadataUri: metadataCID || `local://${serverData.image.hash}`,
+            imageHash: serverData.image.hash,
+            videoHash: serverData.video?.hash || null
           })
         });
-        
         mintData = await mintRes.json();
       } catch (apiError) {
-        console.error("Mint API call failed:", apiError);
+        console.error("Mint API error:", apiError);
         showToast(`❌ Mint preparation failed: ${apiError.message}`, 'error');
         setButtonLoading(UI.generateNFTBtn, false);
         hideProgress();
         return;
       }
       
-      if (!mintData.success) {
-        throw new Error(mintData.error || 'Failed to prepare mint transaction');
-      }
+      if (!mintData.success) throw new Error(mintData.error || 'Mint preparation failed');
       
-      showToast('✍️ Please sign the transaction in your wallet...', 'info');
+      showToast('✍️ Please sign the transaction...', 'info');
       
-      const tx = {
+      const tx = await this.signer.sendTransaction({
         to: mintData.transaction.to,
         data: mintData.transaction.data,
         value: mintData.transaction.value,
         gasLimit: mintData.transaction.gasLimit
-      };
+      });
       
-      const signedTx = await this.signer.sendTransaction(tx);
-      showToast('⏳ Transaction submitted, waiting for confirmation...', 'info');
+      showToast('⏳ Waiting for confirmation...', 'info');
+      await tx.wait();
+      showToast('✅ NFT minted!', 'success');
       
-      await signedTx.wait();
-      showToast('✅ NFT minted successfully! Files saved locally + on Lighthouse!', 'success');
-      
-      alert(`✅ NFT minted successfully!\n\n` +
-        `Transaction: ${signedTx.hash}\n` +
-        `Mint price: ${ethers.formatEther(mintData.transaction.value)} ETH\n` +
-        `CID: ${metadataResult.cid}\n` +
-        `Image Hash: ${imageResult.hash}\n` +
-        `Video Hash: ${videoResult?.hash || 'N/A'}\n` +
-        `\n💾 Files saved to your Downloads folder:\n` +
+      const ls = serverData.lighthouse.success ? '✅' : '⚠️';
+      alert(`✅ NFT minted!\n\n` +
+        `Tx: ${tx.hash}\n` +
+        `Price: ${ethers.formatEther(mintData.transaction.value)} ETH\n\n` +
+        `🔐 Image Hash: ${serverData.image.hash}\n` +
+        `${serverData.video ? '🔐 Video Hash: ' + serverData.video.hash + '\n' : ''}` +
+        `${metadataCID ? '📄 CID: ' + metadataCID + '\n' : ''}` +
+        `\n${ls} Lighthouse: ${serverData.lighthouse.success ? 'OK' : 'Failed (files saved locally)'}` +
+        `\n\n💾 Files saved to Downloads:\n` +
         `- ${imageFileName}\n` +
-        `${videoFileName ? `- ${videoFileName}\n` : ''}` +
-        `- ${metadataFileName}\n` +
-        `\n🌐 Lighthouse Gateway:\n` +
-        `${LIGHTHOUSE_GATEWAY}${metadataResult.cid}`);
+        `${videoFileName ? '- ' + videoFileName + '\n' : ''}` +
+        `- ${metadataFileName}`);
       
     } catch (error) {
       console.error(error);
-      
-      let userMessage = '❌ Mint failed. Please try again.';
-      if (error.message && error.message.includes('insufficient funds')) {
-        userMessage = '💰 Insufficient funds. Please add ETH to your wallet.';
-      } else if (error.message && error.message.includes('User denied')) {
-        userMessage = '🛑 You cancelled the transaction.';
-      } else if (error.message && error.message.includes('Network is Base Sepolia')) {
-        userMessage = '🌐 Please switch to Base Sepolia network in your wallet.';
-      } else if (error.message && error.message.includes('hash mismatch')) {
-        userMessage = '🔐 Security: File hash mismatch detected! Files may have been tampered with.';
-      }
-      
-      showToast(userMessage, 'error');
-      alert(`NFT minting failed.\n\n${userMessage}`);
+      let msg = error.message || 'Unknown error';
+      if (msg.includes('insufficient funds')) msg = '💰 Insufficient funds';
+      if (msg.includes('User denied')) msg = '🛑 Cancelled';
+      showToast('❌ ' + msg, 'error');
+      alert('NFT minting failed.\n\n' + msg);
     } finally { 
       setButtonLoading(UI.generateNFTBtn, false); 
     }
