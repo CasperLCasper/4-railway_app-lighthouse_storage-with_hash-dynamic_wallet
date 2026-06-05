@@ -19,9 +19,6 @@ export function showIPFSPreview(imageURL, videoURL, metadataURL) {
   }
 }
 
-/**
- * Lejupielādē vienu failu (ar dialogu)
- */
 export function downloadFile(blob, filename) {
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
@@ -34,9 +31,6 @@ export function downloadFile(blob, filename) {
   console.log(`💾 Lejupielādēts: ${filename}`);
 }
 
-/**
- * Lejupielādē visus failus kā vienu ZIP arhīvu
- */
 export async function downloadAllFiles(files) {
   const { default: JSZip } = await import('jszip');
   const zip = new JSZip();
@@ -61,9 +55,6 @@ export async function downloadAllFiles(files) {
   console.log(`💾 ZIP arhīvs saglabāts ar ${files.length} failiem`);
 }
 
-/**
- * Aprēķina SHA256 hash no Blob/File lokāli (pārlūkā)
- */
 export async function calculateHashFromBlob(blob) {
   const buffer = await blob.arrayBuffer();
   const hashBuffer = await crypto.subtle.digest('SHA-256', buffer);
@@ -72,9 +63,6 @@ export async function calculateHashFromBlob(blob) {
   return hashHex;
 }
 
-/**
- * Augšupielādē failu caur mūsu servera aizsargāto gala punktu
- */
 export async function uploadFileToIPFS(file) {
   showToast('Uploading file to Lighthouse...', 'info');
   
