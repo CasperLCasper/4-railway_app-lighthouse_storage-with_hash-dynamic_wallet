@@ -85,26 +85,22 @@ export async function onRequestPost(context) {
 
     console.log(`🚀 Apstrādājam NFT failus lietotājam ${user.address}...`);
 
-    // Attēla hash
     const imageArrayBuffer = await imageFile.arrayBuffer();
     const imageBuffer = Buffer.from(imageArrayBuffer);
     const imageHash = '0x' + crypto.createHash('sha256').update(imageBuffer).digest('hex');
     console.log('🔐 Image Hash:', imageHash);
 
-    // Video hash
     let videoHash = null;
     if (videoBuffer) {
       videoHash = '0x' + crypto.createHash('sha256').update(videoBuffer).digest('hex');
       console.log('🔐 Video Hash:', videoHash);
     }
 
-    // Mēģinam augšupielādēt uz Lighthouse caur SDK
     let imageCid = null;
     let videoCid = null;
     let lighthouseError = null;
 
     if (env.LIGHTHOUSE_API_KEY) {
-      // Attēls caur SDK
       try {
         console.log('📤 Mēģinam augšupielādēt attēlu caur Lighthouse SDK...');
         
@@ -128,7 +124,6 @@ export async function onRequestPost(context) {
         lighthouseError = error.message;
       }
 
-      // Video caur SDK
       if (videoBuffer) {
         try {
           console.log('📤 Mēģinam augšupielādēt video caur Lighthouse SDK...');
