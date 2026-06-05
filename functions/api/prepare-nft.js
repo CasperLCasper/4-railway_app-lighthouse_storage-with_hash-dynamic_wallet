@@ -36,30 +36,47 @@ export async function onRequestPost(context) {
     const imageFile = formData.get('image');
     const videoFile = formData.get('video');
 
-    if (!imageFile || !(imageFile instanceof globalThis.File)) {
+    if (!imageFile) {
       return new Response(JSON.stringify({ error: 'No image file provided' }), {
         status: 400, headers: { "Content-Type": "application/json" }
       });
     }
 
-    if (!ALLOWED_TYPES.includes(imageFile.type)) {
-      return new Response(JSON.stringify({ error: `Image type not allowed: ${imageFile.type}` }), {
+    const imageArrayBuffer = await imageFile.arrayBuffer();
+    const imageBuffer = Buffer.from(imageArrayBuffer);
+    const imageType = imageFile.type || 'image/png';
+    const imageName = imageFile.name || 'snapshot.png';
+    const imageSize = imageFile.size;
+
+    if (!ALLOWED_TYPES.includes(imageType)) {
+      return new Response(JSON.stringify({ error: `Image type not allowed: ${imageType}` }), {
         status: 400, headers: { "Content-Type": "application/json" }
       });
     }
-    if (imageFile.size > MAX_SIZE) {
+    if (imageSize > MAX_SIZE) {
       return new Response(JSON.stringify({ error: 'Image too large. Max 50MB' }), {
         status: 400, headers: { "Content-Type": "application/json" }
       });
     }
 
+    let videoBuffer = null;
+    let videoType = null;
+    let videoName = null;
+    let videoSize = null;
+
     if (videoFile) {
-      if (!ALLOWED_TYPES.includes(videoFile.type)) {
-        return new Response(JSON.stringify({ error: `Video type not allowed: ${videoFile.type}` }), {
+      const videoArrayBuffer = await videoFile.arrayBuffer();
+      videoBuffer = Buffer.from(videoArrayBuffer);
+      videoType = videoFile.type || 'video/webm';
+      videoName = videoFile.name || 'video.webm';
+      videoSize = videoFile.size;
+
+      if (!ALLOWED_TYPES.includes(videoType)) {
+        return new Response(JSON.stringify({ error: `Video type not allowed: ${videoType}` }), {
           status: 400, headers: { "Content-Type": "application/json" }
         });
       }
-      if (videoFile.size > MAX_SIZE) {
+      if (videoSize > MAX_SIZE) {
         return new Response(JSON.stringify({ error: 'Video too large. Max 50MB' }), {
           status: 400, headers: { "Content-Type": "application/json" }
         });
@@ -68,21 +85,6 @@ export async function onRequestPost(context) {
 
     console.log(`🚀 Apstrādājam NFT failus lietotājam ${user.address}...`);
 
-    const imageArrayBuffer = await imageFile.arrayBuffer();
-    const imageBuffer = Buffer.from(imageArrayBuffer);
-    
-    let videoBuffer = null;
-    let videoMimeType = null;
-    let videoFileName = null;
-    
-    if (videoFile) {
-      const videoArrayBuffer = await videoFile.arrayBuffer();
-      videoBuffer = Buffer.from(videoArrayBuffer);
-      videoMimeType = videoFile.type;
-      videoFileName = videoFile.name;
-    }
-
-    // Aprēķinam hash
     const imageHash = '0x' + crypto.createHash('sha256').update(imageBuffer).digest('hex');
     console.log('🔐 Image Hash:', imageHash);
 
@@ -92,7 +94,6 @@ export async function onRequestPost(context) {
       console.log('🔐 Video Hash:', videoHash);
     }
 
-    // Mēģinam augšupielādēt uz Lighthouse
     let imageCid = null;
     let videoCid = null;
     let lighthouseError = null;
@@ -101,22 +102,29 @@ export async function onRequestPost(context) {
       try {
         console.log('📤 Mēģinam augšupielādēt attēlu uz Lighthouse...');
         
-        const imageFormData = new FormData();
-        imageFormData.append('file', new globalThis.File([imageBuffer], imageFile.name, { type: imageFile.type }));
+        const imageBlob = new Blob([imageBuffer], { type: imageType });
+        const lighthouseForm = new FormData();
+        lighthouseForm.append('file', imageBlob, imageName);
 
         const imageResponse = await fetch('https://api.lighthouse.storage/api/v0/upload', {
           method: 'POST',
           headers: {
-            'Authorization': `Bearer ${env.LIGHTHOUSE_API_KEY}`,
-            'X-Storage-Type': 'annual'
+            'Authorization': `Bearer ${env.LIGHTHOUSE_API_KEY}`
           },
-          body: imageFormData
+          body: lighthouseForm
         });
 
+        const responseText = await imageResponse.text();
+        console.log('Lighthouse attēla atbilde:', imageResponse.status, responseText.substring(0, 200));
+
         if (imageResponse.ok) {
-          const imageResult = await imageResponse.json();
-          imageCid = imageResult?.data?.Hash || imageResult?.Hash;
-          if (imageCid) console.log('✅ Attēls augšupielādēts Lighthouse:', imageCid);
+          try {
+            const imageResult = JSON.parse(responseText);
+            imageCid = imageResult?.data?.Hash || imageResult?.Hash;
+            if (imageCid) console.log('✅ Attēls augšupielādēts Lighthouse:', imageCid);
+          } catch (parseErr) {
+            console.warn('⚠️ Neizdevās parsēt Lighthouse atbildi:', parseErr.message);
+          }
         } else {
           console.warn('⚠️ Lighthouse attēla augšupielāde neizdevās:', imageResponse.status);
           lighthouseError = `HTTP ${imageResponse.status}`;
@@ -130,22 +138,29 @@ export async function onRequestPost(context) {
         try {
           console.log('📤 Mēģinam augšupielādēt video uz Lighthouse...');
           
-          const videoFormData = new FormData();
-          videoFormData.append('file', new globalThis.File([videoBuffer], videoFileName, { type: videoMimeType }));
+          const videoBlob = new Blob([videoBuffer], { type: videoType });
+          const videoLighthouseForm = new FormData();
+          videoLighthouseForm.append('file', videoBlob, videoName);
 
           const videoResponse = await fetch('https://api.lighthouse.storage/api/v0/upload', {
             method: 'POST',
             headers: {
-              'Authorization': `Bearer ${env.LIGHTHOUSE_API_KEY}`,
-              'X-Storage-Type': 'annual'
+              'Authorization': `Bearer ${env.LIGHTHOUSE_API_KEY}`
             },
-            body: videoFormData
+            body: videoLighthouseForm
           });
 
+          const videoResponseText = await videoResponse.text();
+          console.log('Lighthouse video atbilde:', videoResponse.status, videoResponseText.substring(0, 200));
+
           if (videoResponse.ok) {
-            const videoResult = await videoResponse.json();
-            videoCid = videoResult?.data?.Hash || videoResult?.Hash;
-            if (videoCid) console.log('✅ Video augšupielādēts Lighthouse:', videoCid);
+            try {
+              const videoResult = JSON.parse(videoResponseText);
+              videoCid = videoResult?.data?.Hash || videoResult?.Hash;
+              if (videoCid) console.log('✅ Video augšupielādēts Lighthouse:', videoCid);
+            } catch (parseErr) {
+              console.warn('⚠️ Neizdevās parsēt Lighthouse video atbildi:', parseErr.message);
+            }
           } else {
             console.warn('⚠️ Lighthouse video augšupielāde neizdevās:', videoResponse.status);
           }
@@ -163,16 +178,16 @@ export async function onRequestPost(context) {
       image: {
         hash: imageHash,
         cid: imageCid || null,
-        fileName: imageFile.name,
-        mimeType: imageFile.type,
-        size: imageFile.size
+        fileName: imageName,
+        mimeType: imageType,
+        size: imageSize
       },
       video: videoBuffer ? {
         hash: videoHash,
         cid: videoCid || null,
-        fileName: videoFileName,
-        mimeType: videoMimeType,
-        size: videoFile.size
+        fileName: videoName,
+        mimeType: videoType,
+        size: videoSize
       } : null,
       lighthouse: {
         success: !!(imageCid || videoCid),
