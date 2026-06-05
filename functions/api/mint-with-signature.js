@@ -1,7 +1,6 @@
 import { ethers } from 'ethers';
 import { requireAuth } from "../_lib/auth.js";
 import { checkRateLimit } from "../_lib/rateLimit.js";
-import { getCache, deleteCache } from "../_lib/cache.js";
 
 const WALLET_NFT_ABI = [
   "function mintWithSignature(address wallet, string calldata metadataUri, bytes32 imageHash, bytes32 videoHash, uint256 nonceParam, bytes calldata signature) external payable",
@@ -50,39 +49,25 @@ export async function onRequestPost(context) {
       });
     }
 
-    // Validē hash formātu (0x + 64 hex chars) vai ZeroHash
-    const finalImageHash = imageHash && /^0x[0-9a-fA-F]{64}$/.test(imageHash) 
-      ? imageHash 
-      : ethers.ZeroHash;
-    const finalVideoHash = videoHash && /^0x[0-9a-fA-F]{64}$/.test(videoHash) 
-      ? videoHash 
-      : ethers.ZeroHash;
-
-    // Notīrām CID no jebkādiem prefiksiem
-    let cleanMetadataCID = metadataUri.trim();
-    if (cleanMetadataCID.startsWith('ipfs://')) {
-      cleanMetadataCID = cleanMetadataCID.substring(7);
-    } else if (cleanMetadataCID.startsWith('https://')) {
-      const parts = cleanMetadataCID.split('/');
-      cleanMetadataCID = parts[parts.length - 1];
-    }
-    if (cleanMetadataCID.includes('/')) {
-      cleanMetadataCID = cleanMetadataCID.split('/')[0];
-    }
-
-    const lastUploadKey = `lastUploadCID:${user.address.toLowerCase()}`;
-    const lastCID = await getCache(lastUploadKey, env);
-
-    if (!lastCID || lastCID !== cleanMetadataCID) {
-      return new Response(JSON.stringify({
-        success: false,
-        error: 'Invalid or expired metadata CID. Please re-upload metadata.'
-      }), {
+    if (!imageHash || !/^0x[0-9a-fA-F]{64}$/.test(imageHash)) {
+      return new Response(JSON.stringify({ success: false, error: 'Invalid or missing image hash' }), {
         status: 400, headers: { "Content-Type": "application/json" }
       });
     }
 
-    await deleteCache(lastUploadKey, env);
+    const finalImageHash = imageHash;
+    const finalVideoHash = (videoHash && /^0x[0-9a-fA-F]{64}$/.test(videoHash)) 
+      ? videoHash 
+      : ethers.ZeroHash;
+
+    let fullMetadataUri = metadataUri.trim();
+    
+    if (fullMetadataUri.startsWith('Qm') || fullMetadataUri.startsWith('baf')) {
+      fullMetadataUri = `https://meaningful-macaw-y3g2r.lighthouseweb3.xyz/ipfs/${fullMetadataUri}`;
+    } else if (fullMetadataUri.startsWith('ipfs://')) {
+      const cid = fullMetadataUri.substring(7);
+      fullMetadataUri = `https://meaningful-macaw-y3g2r.lighthouseweb3.xyz/ipfs/${cid}`;
+    }
 
     const CONTRACT_ADDRESS = env.CONTRACT_ADDRESS;
     const SERVER_PRIVATE_KEY = env.SERVER_PRIVATE_KEY;
@@ -108,14 +93,12 @@ export async function onRequestPost(context) {
       });
     }
 
-    // 🌟 Izveidojam tiešo HTTPS saiti caur Lighthouse gateway
-    const fullIpfsUri = `https://meaningful-macaw-y3g2r.lighthouseweb3.xyz/ipfs/${cleanMetadataCID}`;
     const serverWallet = new ethers.Wallet(SERVER_PRIVATE_KEY);
 
     const domain = {
       name: 'WalletVisualizer',
       version: '1',
-      chainId: 84532, // Base Sepolia
+      chainId: 84532,
       verifyingContract: CONTRACT_ADDRESS
     };
 
@@ -131,7 +114,7 @@ export async function onRequestPost(context) {
 
     const value = {
       wallet: wallet,
-      metadataUri: fullIpfsUri,
+      metadataUri: fullMetadataUri,
       imageHash: finalImageHash,
       videoHash: finalVideoHash,
       nonce: currentNonce
@@ -142,7 +125,7 @@ export async function onRequestPost(context) {
     const iface = new ethers.Interface(WALLET_NFT_ABI);
     const data = iface.encodeFunctionData('mintWithSignature', [
       wallet, 
-      fullIpfsUri, 
+      fullMetadataUri, 
       finalImageHash, 
       finalVideoHash, 
       currentNonce, 
@@ -170,8 +153,9 @@ export async function onRequestPost(context) {
         value: mintPrice.toString(),
         gasLimit: estimatedGas.toString()
       },
-      imageHash: finalImageHash !== ethers.ZeroHash ? finalImageHash : null,
-      videoHash: finalVideoHash !== ethers.ZeroHash ? finalVideoHash : null
+      imageHash: finalImageHash,
+      videoHash: finalVideoHash !== ethers.ZeroHash ? finalVideoHash : null,
+      metadataUri: fullMetadataUri
     }), {
       status: 200, headers: { "Content-Type": "application/json" }
     });
