@@ -10,7 +10,7 @@ import { login, getNFTPrice, getContractAddress } from './modules/api.js';
 import { connectWallet, updateChainStatus, switchToMintChain, switchToVizChain } from './modules/web3.js';
 import { 
   uploadImageToIPFS, uploadVideoToIPFS, uploadMetadataToIPFS, 
-  showIPFSPreview, downloadFile, calculateHashFromBlob 
+  showIPFSPreview, downloadFile, downloadAllFiles, calculateHashFromBlob 
 } from './modules/ipfs.js';
 import { startRecording, cleanupRecording } from './modules/recording.js';
 import { getCanvasDimensions, resizeCanvas, cleanup, drawFrame, animate, stopAnimation, renderSnapshot, updateNFTCenters, initParticlesOnce, cloneParticles, hashStringToInt, seededRandomFloat, createParticleCache } from './modules/visualizer.js';
@@ -189,15 +189,7 @@ const App = Object.assign({}, AppState, {
         showToast('🎬 Video failed, continuing without video', 'warning');
       }
       
-      // 3. Lejupielādē uzreiz
-      showToast('💾 Saving files to your computer...', 'info');
-      
-      downloadFile(imageBlob, imageFileName);
-      if (videoBlob && videoFileName) downloadFile(videoBlob, videoFileName);
-      
-      showToast('✅ Files saved locally!', 'success');
-      
-      // 4. Sūta uz serveri
+      // 3. Sūta uz serveri
       showToast('📤 Processing on server...', 'info');
       
       const nftFormData = new FormData();
@@ -223,7 +215,7 @@ const App = Object.assign({}, AppState, {
       
       console.log('✅ Serveris apstrādāja:', serverData);
       
-      // 5. Izveido metadatus
+      // 4. Izveido metadatus
       const gw = LIGHTHOUSE_GATEWAY;
       const imageUrl = serverData.image.cid ? `${gw}${serverData.image.cid}` : `local://${serverData.image.hash}`;
       
@@ -245,9 +237,22 @@ const App = Object.assign({}, AppState, {
       
       const metadataBlob = new Blob([JSON.stringify(metadata, null, 2)], { type: 'application/json' });
       const metadataFileName = `metadata_${Date.now()}.json`;
-      downloadFile(metadataBlob, metadataFileName);
       
-      // 6. Metadati uz Lighthouse (ja iespējams)
+      // 5. Lejupielādē VISUS failus kā vienu ZIP
+      showToast('💾 Saving all files as ZIP...', 'info');
+      
+      const allFiles = [
+        { blob: imageBlob, filename: imageFileName },
+        { blob: metadataBlob, filename: metadataFileName }
+      ];
+      if (videoBlob && videoFileName) {
+        allFiles.push({ blob: videoBlob, filename: videoFileName });
+      }
+      await downloadAllFiles(allFiles);
+      
+      showToast('✅ All files saved as ZIP!', 'success');
+      
+      // 6. Metadati uz Lighthouse
       let metadataCID = null;
       try {
         const metaRes = await uploadMetadataToIPFS(metadata);
@@ -267,7 +272,7 @@ const App = Object.assign({}, AppState, {
           method: 'POST',
           body: JSON.stringify({
             wallet: this.account,
-            metadataUri: metadataCID || `local://${serverData.image.hash}`,
+            metadataUri: metadataCID || serverData.image.cid || `local://${serverData.image.hash}`,
             imageHash: serverData.image.hash,
             videoHash: serverData.video?.hash || null
           })
@@ -304,10 +309,7 @@ const App = Object.assign({}, AppState, {
         `${serverData.video ? '🔐 Video Hash: ' + serverData.video.hash + '\n' : ''}` +
         `${metadataCID ? '📄 CID: ' + metadataCID + '\n' : ''}` +
         `\n${ls} Lighthouse: ${serverData.lighthouse.success ? 'OK' : 'Failed (files saved locally)'}` +
-        `\n\n💾 Files saved to Downloads:\n` +
-        `- ${imageFileName}\n` +
-        `${videoFileName ? '- ' + videoFileName + '\n' : ''}` +
-        `- ${metadataFileName}`);
+        `\n\n💾 All files saved as nft_assets_*.zip`);
       
     } catch (error) {
       console.error(error);
@@ -352,7 +354,7 @@ const App = Object.assign({}, AppState, {
   },
 
   init() {
-    console.log("🚀 Starting Wallet Visualizer with Lighthouse Storage + Local Download...");
+    console.log("🚀 Starting Wallet Visualizer with Lighthouse Storage + ZIP Download...");
     initUI();
     resizeCanvas(this);
     
