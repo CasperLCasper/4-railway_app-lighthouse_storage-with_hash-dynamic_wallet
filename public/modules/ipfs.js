@@ -32,7 +32,7 @@ export function downloadFile(blob, filename) {
 }
 
 export async function downloadAllFiles(files) {
-  const { default: JSZip } = await import('jszip');
+  // JSZip ir globāli pieejams no CDN (ielādēts index.html)
   const zip = new JSZip();
   
   for (const { blob, filename } of files) {
