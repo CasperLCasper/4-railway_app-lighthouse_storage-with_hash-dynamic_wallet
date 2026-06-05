@@ -20,7 +20,7 @@ export function showIPFSPreview(imageURL, videoURL, metadataURL) {
 }
 
 /**
- * Lejupielādē failu lietotāja datorā
+ * Lejupielādē vienu failu (ar dialogu)
  */
 export function downloadFile(blob, filename) {
   const url = URL.createObjectURL(blob);
@@ -32,6 +32,33 @@ export function downloadFile(blob, filename) {
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
   console.log(`💾 Lejupielādēts: ${filename}`);
+}
+
+/**
+ * Lejupielādē visus failus kā vienu ZIP arhīvu
+ */
+export async function downloadAllFiles(files) {
+  const { default: JSZip } = await import('jszip');
+  const zip = new JSZip();
+  
+  for (const { blob, filename } of files) {
+    zip.file(filename, blob);
+  }
+  
+  const zipBlob = await zip.generateAsync({ type: 'blob' });
+  const url = URL.createObjectURL(zipBlob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `nft_assets_${Date.now()}.zip`;
+  document.body.appendChild(a);
+  a.click();
+  
+  setTimeout(() => {
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }, 100);
+  
+  console.log(`💾 ZIP arhīvs saglabāts ar ${files.length} failiem`);
 }
 
 /**
@@ -75,7 +102,7 @@ export async function uploadFileToIPFS(file) {
   if (!result.cid) throw new Error("Upload failed - no CID returned");
   
   console.log("File uploaded to Lighthouse:", result.cid, "Hash:", result.hash);
-  return result; // { ipfs, http, cid, hash }
+  return result;
 }
 
 export async function uploadMetadataToIPFS(metadata) {
