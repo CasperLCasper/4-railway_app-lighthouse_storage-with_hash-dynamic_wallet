@@ -1,5 +1,6 @@
 import { requireAuth } from "../_lib/auth.js";
 import { checkRateLimit } from "../_lib/rateLimit.js";
+import lighthouse from '@lighthouse-web3/sdk';
 import crypto from 'crypto';
 
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'video/mp4', 'video/webm'];
@@ -36,14 +37,12 @@ export async function onRequestPost(context) {
     const imageFile = formData.get('image');
     const videoFile = formData.get('video');
 
-    if (!imageFile) {
+    if (!imageFile || !(imageFile instanceof File)) {
       return new Response(JSON.stringify({ error: 'No image file provided' }), {
         status: 400, headers: { "Content-Type": "application/json" }
       });
     }
 
-    const imageArrayBuffer = await imageFile.arrayBuffer();
-    const imageBuffer = Buffer.from(imageArrayBuffer);
     const imageType = imageFile.type || 'image/png';
     const imageName = imageFile.name || 'snapshot.png';
     const imageSize = imageFile.size;
@@ -64,9 +63,7 @@ export async function onRequestPost(context) {
     let videoName = null;
     let videoSize = null;
 
-    if (videoFile) {
-      const videoArrayBuffer = await videoFile.arrayBuffer();
-      videoBuffer = Buffer.from(videoArrayBuffer);
+    if (videoFile && videoFile instanceof File) {
       videoType = videoFile.type || 'video/webm';
       videoName = videoFile.name || 'video.webm';
       videoSize = videoFile.size;
@@ -81,88 +78,74 @@ export async function onRequestPost(context) {
           status: 400, headers: { "Content-Type": "application/json" }
         });
       }
+
+      const videoArrayBuffer = await videoFile.arrayBuffer();
+      videoBuffer = Buffer.from(videoArrayBuffer);
     }
 
     console.log(`🚀 Apstrādājam NFT failus lietotājam ${user.address}...`);
 
+    // Attēla hash
+    const imageArrayBuffer = await imageFile.arrayBuffer();
+    const imageBuffer = Buffer.from(imageArrayBuffer);
     const imageHash = '0x' + crypto.createHash('sha256').update(imageBuffer).digest('hex');
     console.log('🔐 Image Hash:', imageHash);
 
+    // Video hash
     let videoHash = null;
     if (videoBuffer) {
       videoHash = '0x' + crypto.createHash('sha256').update(videoBuffer).digest('hex');
       console.log('🔐 Video Hash:', videoHash);
     }
 
+    // Mēģinam augšupielādēt uz Lighthouse caur SDK
     let imageCid = null;
     let videoCid = null;
     let lighthouseError = null;
 
     if (env.LIGHTHOUSE_API_KEY) {
+      // Attēls caur SDK
       try {
-        console.log('📤 Mēģinam augšupielādēt attēlu uz Lighthouse...');
+        console.log('📤 Mēģinam augšupielādēt attēlu caur Lighthouse SDK...');
         
-        const imageBlob = new Blob([imageBuffer], { type: imageType });
-        const lighthouseForm = new FormData();
-        lighthouseForm.append('file', imageBlob, imageName);
+        const uploadResponse = await lighthouse.uploadBuffer(
+          imageBuffer,
+          env.LIGHTHOUSE_API_KEY,
+          false,
+          null,
+          { storageType: "annual" }
+        );
 
-        const imageResponse = await fetch('https://api.lighthouse.storage/api/v0/upload', {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${env.LIGHTHOUSE_API_KEY}`
-          },
-          body: lighthouseForm
-        });
-
-        const responseText = await imageResponse.text();
-        console.log('Lighthouse attēla atbilde:', imageResponse.status, responseText.substring(0, 200));
-
-        if (imageResponse.ok) {
-          try {
-            const imageResult = JSON.parse(responseText);
-            imageCid = imageResult?.data?.Hash || imageResult?.Hash;
-            if (imageCid) console.log('✅ Attēls augšupielādēts Lighthouse:', imageCid);
-          } catch (parseErr) {
-            console.warn('⚠️ Neizdevās parsēt Lighthouse atbildi:', parseErr.message);
-          }
+        imageCid = uploadResponse?.data?.Hash || uploadResponse?.Hash;
+        if (imageCid) {
+          console.log('✅ Attēls augšupielādēts Lighthouse:', imageCid);
         } else {
-          console.warn('⚠️ Lighthouse attēla augšupielāde neizdevās:', imageResponse.status);
-          lighthouseError = `HTTP ${imageResponse.status}`;
+          console.warn('⚠️ Lighthouse SDK neatgrieza CID attēlam');
+          lighthouseError = 'No CID returned';
         }
       } catch (error) {
         console.warn('⚠️ Lighthouse attēla augšupielādes kļūda:', error.message);
         lighthouseError = error.message;
       }
 
+      // Video caur SDK
       if (videoBuffer) {
         try {
-          console.log('📤 Mēģinam augšupielādēt video uz Lighthouse...');
+          console.log('📤 Mēģinam augšupielādēt video caur Lighthouse SDK...');
           
-          const videoBlob = new Blob([videoBuffer], { type: videoType });
-          const videoLighthouseForm = new FormData();
-          videoLighthouseForm.append('file', videoBlob, videoName);
+          const uploadResponse = await lighthouse.uploadBuffer(
+            videoBuffer,
+            env.LIGHTHOUSE_API_KEY,
+            false,
+            null,
+            { storageType: "annual" }
+          );
 
-          const videoResponse = await fetch('https://api.lighthouse.storage/api/v0/upload', {
-            method: 'POST',
-            headers: {
-              'Authorization': `Bearer ${env.LIGHTHOUSE_API_KEY}`
-            },
-            body: videoLighthouseForm
-          });
-
-          const videoResponseText = await videoResponse.text();
-          console.log('Lighthouse video atbilde:', videoResponse.status, videoResponseText.substring(0, 200));
-
-          if (videoResponse.ok) {
-            try {
-              const videoResult = JSON.parse(videoResponseText);
-              videoCid = videoResult?.data?.Hash || videoResult?.Hash;
-              if (videoCid) console.log('✅ Video augšupielādēts Lighthouse:', videoCid);
-            } catch (parseErr) {
-              console.warn('⚠️ Neizdevās parsēt Lighthouse video atbildi:', parseErr.message);
-            }
+          videoCid = uploadResponse?.data?.Hash || uploadResponse?.Hash;
+          if (videoCid) {
+            console.log('✅ Video augšupielādēts Lighthouse:', videoCid);
           } else {
-            console.warn('⚠️ Lighthouse video augšupielāde neizdevās:', videoResponse.status);
+            console.warn('⚠️ Lighthouse SDK neatgrieza CID video');
           }
         } catch (error) {
           console.warn('⚠️ Lighthouse video augšupielādes kļūda:', error.message);
