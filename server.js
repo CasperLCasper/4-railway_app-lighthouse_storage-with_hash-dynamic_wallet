@@ -43,7 +43,7 @@ app.use((req, res, next) => {
     res.setHeader('X-Content-Type-Options', 'nosniff');
     res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
     res.setHeader('Permissions-Policy', 'geolocation=(), camera=(), microphone=()');
-    res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+    res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
     next();
 });
 
@@ -64,7 +64,6 @@ function createCloudflareAdapter(handler) {
                 request: {
                     json: async () => req.body,
                     formData: async () => {
-                        // Izmantojam tīru, drošu glabātuvi
                         const storage = {};
                         
                         if (req.rawBody) {
@@ -117,7 +116,6 @@ function createCloudflareAdapter(handler) {
                             });
                         }
                         
-                        // Šī ir DROŠĀ metodes emulācija, kas neizsauc sevi bezgalīgi
                         return {
                             get: (key) => storage[key] || null,
                             has: (key) => key in storage
