@@ -148,9 +148,7 @@ const App = Object.assign({}, AppState, {
     showToast('📸 Creating your NFT assets...', 'info');
     
     try {
-      // =============================================
-      // 1. 📸 IZVEIDO ATTĒLU NO CANVAS
-      // =============================================
+      // 1. Izveido attēlu
       const imageBlob = await new Promise((resolve, reject) => {
         UI.canvas.toBlob((blob) => {
           if (blob) resolve(blob);
@@ -161,9 +159,7 @@ const App = Object.assign({}, AppState, {
       const imageFileName = `snapshot_${Date.now()}.png`;
       const imageFile = new File([imageBlob], imageFileName, { type: 'image/png' });
       
-      // =============================================
-      // 2. 🎬 IERAKSTA VIDEO
-      // =============================================
+      // 2. Ieraksta video
       let videoBlob = null;
       let videoFileName = null;
       let videoFile = null;
@@ -193,9 +189,7 @@ const App = Object.assign({}, AppState, {
         showToast('🎬 Video failed, continuing without video', 'warning');
       }
       
-      // =============================================
-      // 3. 💾 LEJUPIELĀDĒ VISUS FAILUS UZREIZ
-      // =============================================
+      // 3. Lejupielādē uzreiz
       showToast('💾 Saving files to your computer...', 'info');
       
       downloadFile(imageBlob, imageFileName);
@@ -203,9 +197,7 @@ const App = Object.assign({}, AppState, {
       
       showToast('✅ Files saved locally!', 'success');
       
-      // =============================================
-      // 4. 📤 SŪTA UZ SERVERI (PREPARE-NFT)
-      // =============================================
+      // 4. Sūta uz serveri
       showToast('📤 Processing on server...', 'info');
       
       const nftFormData = new FormData();
@@ -231,9 +223,7 @@ const App = Object.assign({}, AppState, {
       
       console.log('✅ Serveris apstrādāja:', serverData);
       
-      // =============================================
-      // 5. 📄 IZVEIDO METADATUS
-      // =============================================
+      // 5. Izveido metadatus
       const gw = LIGHTHOUSE_GATEWAY;
       const imageUrl = serverData.image.cid ? `${gw}${serverData.image.cid}` : `local://${serverData.image.hash}`;
       
@@ -257,9 +247,7 @@ const App = Object.assign({}, AppState, {
       const metadataFileName = `metadata_${Date.now()}.json`;
       downloadFile(metadataBlob, metadataFileName);
       
-      // =============================================
-      // 6. 📤 METADATI UZ LIGHTHOUSE (ja iespējams)
-      // =============================================
+      // 6. Metadati uz Lighthouse (ja iespējams)
       let metadataCID = null;
       try {
         const metaRes = await uploadMetadataToIPFS(metadata);
@@ -270,9 +258,7 @@ const App = Object.assign({}, AppState, {
         showToast('⚠️ Metadata upload failed, continuing anyway', 'warning');
       }
       
-      // =============================================
-      // 7. ⛓️ MINT NFT
-      // =============================================
+      // 7. Mint
       showToast('📝 Preparing mint...', 'info');
       
       let mintData;
