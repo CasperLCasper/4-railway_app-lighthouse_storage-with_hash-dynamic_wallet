@@ -13,122 +13,26 @@
   <!-- JSZip CDN priekš ZIP lejupielādes -->
   <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
   
-  <style>
-    /* Modal stils */
-    #aboutModal {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0,0,0,0.7);
-      z-index: 1000;
-    }
-    
-    #aboutModal .modal-content {
-      position: relative;
-      max-width: 600px;
-      max-height: 80vh;
-      margin: 80px auto;
-      background: #fff;
-      color: #000;
-      border-radius: 12px;
-      padding: 30px 25px;
-      font-family: 'Inter', Arial, sans-serif;
-      overflow-y: auto;
-    }
-    
-    #aboutModal .modal-close {
-      position: absolute;
-      top: 12px;
-      right: 16px;
-      background: none;
-      border: none;
-      font-size: 24px;
-      cursor: pointer;
-      color: #666;
-      padding: 0;
-      line-height: 1;
-      box-shadow: none;
-    }
-    
-    #aboutModal .modal-close:hover {
-      color: #000;
-    }
-    
-    #aboutModal h1 {
-      font-size: 1.5rem;
-      margin-bottom: 20px;
-      font-weight: 600;
-      background: none;
-      -webkit-text-fill-color: #000;
-      color: #000;
-      text-align: left;
-    }
-    
-    #aboutModal h2 {
-      font-size: 1.1rem;
-      margin-top: 20px;
-      color: #333;
-      font-weight: 600;
-    }
-    
-    #aboutModal p {
-      line-height: 1.6;
-      color: #444;
-      font-size: 0.95rem;
-    }
-    
-    #aboutModal ul, #aboutModal ol {
-      padding-left: 22px;
-      color: #444;
-      font-size: 0.95rem;
-    }
-    
-    #aboutModal li {
-      padding: 4px 0;
-      line-height: 1.5;
-    }
-    
-    /* About poga */
-    .about-btn {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      padding: 8px 16px;
-      border: 1px solid #a0c4ff;
-      color: #a0c4ff;
-      border-radius: 8px;
-      text-decoration: none;
-      font-size: 0.85rem;
-      z-index: 999;
-      background: rgba(0,0,0,0.6);
-      backdrop-filter: blur(4px);
-      font-family: 'Inter', Arial, sans-serif;
-      cursor: pointer;
-    }
-    
-    .about-btn:hover {
-      background: rgba(160,196,255,0.15);
-    }
-  </style>
+  <!-- Font Awesome priekš ikonām -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
 <body>
   <!-- About Modal -->
-  <div id="aboutModal">
-    <div class="modal-content">
-      <button class="modal-close" onclick="document.getElementById('aboutModal').style.display='none'">&times;</button>
-      
-      <h1>Wallet Visualizer — Tavs maks, tava māksla</h1>
-
-      <h2>Kas tas ir?</h2>
+  <div class="about-overlay" id="aboutOverlay"></div>
+  <div class="about-modal" id="aboutModal">
+    <div class="about-modal-header">
+      <h2>About Platform</h2>
+      <button class="about-modal-close" id="closeAboutModal" aria-label="Aizvērt">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <div class="about-modal-content">
       <p>Wallet Visualizer parvērš tavu Ethereum maku unikālā vizuālā mākslā un ļauj to saglabāt kā NFT ar pārbaudāmu autentiskumu.</p>
       <p>Pieslēdz savu maku, izvēlies tēmu, un platforma ģenerēs tavu personīgo maka vizualizāciju — attēlu un 15 sekunžu video.</p>
 
-      <h2>Kā tas strādā?</h2>
+      <h3>Kā tas strādā?</h3>
       <ol>
-        <li><strong>Pieslēdz maku</strong> — izmanto jebkuru Web3 maku (MetaMask, Rainbow u.c.)</li>
+        <li><strong>Pieslēdz maku</strong> — izmanto jebkuru Web3 maku</li>
         <li><strong>Izvēlies blokķēdi</strong> — atbalstītas vairākas testnet ķēdes</li>
         <li><strong>Nospied "Generate NFT"</strong> — platforma izveidos attēlu, video un metadatus</li>
         <li><strong>Saņem failus</strong> — visi faili tiek saglabāti tavā datorā kā ZIP arhīvs</li>
@@ -136,7 +40,7 @@
         <li><strong>Hash blokķēdē</strong> — SHA256 hash tiek ierakstīts Base Sepolia līgumā</li>
       </ol>
 
-      <h2>Ko tu iegūsti?</h2>
+      <h3>Ko tu iegūsti?</h3>
       <ul>
         <li><strong>Attēls</strong> — tava maka vizualizācija PNG formātā</li>
         <li><strong>Video</strong> — 15 sekunžu animācija</li>
@@ -146,34 +50,20 @@
         <li><strong>Lighthouse.storage</strong> — decentralizēta glabāšana IPFS + Filecoin</li>
       </ul>
 
-      <h2>Kāpēc hash ir svarīgs?</h2>
+      <h3>Kāpēc hash ir svarīgs?</h3>
       <p>Katram NFT tiek aprēķināts SHA256 hash — unikāls digitāls pirksta nospiedums.</p>
       <ul>
         <li>Hash tiek ierakstīts blokķēdē</li>
         <li>Jebkurš var pārbaudīt, vai fails atbilst oriģinālam</li>
         <li>Pat ja Lighthouse nav pieejams, hash paliek kā pierādījums</li>
       </ul>
-
-      <h2>Vai faili ir droši?</h2>
-      <ul>
-        <li><strong>Saglabāti tavā datorā</strong> — uzreiz pēc izveides</li>
-        <li><strong>Augšupielādēti Lighthouse.storage</strong> — decentralizēta IPFS + Filecoin glabāšana</li>
-        <li><strong>Aizsargāti ar hash</strong> — jebkurš fails ir pārbaudāms pret blokķēdi</li>
-      </ul>
-
-      <h2>Cik tas maksā?</h2>
-      <ul>
-        <li><strong>Gāzes maksa</strong> — standarta Base Sepolia transakcijas maksa (testnetā)</li>
-        <li><strong>Lighthouse glabāšana</strong> — iekļauta platformā</li>
-      </ul>
-
-      <h2>Kā sākt?</h2>
-      <p>Pieslēdz savu maku un nospied "Generate NFT" — pārējo izdarīs platforma.</p>
     </div>
   </div>
 
   <!-- About poga -->
-  <a href="#" class="about-btn" onclick="document.getElementById('aboutModal').style.display='block'; return false;">About Platform</a>
+  <button class="about-toggle" id="aboutToggle" aria-label="About Platform">
+    <i class="fas fa-info"></i>
+  </button>
 
   <div class="warning-banner" id="warningBanner">
     ⚠️ Please do not close this tab while recording video! ⚠️
@@ -282,6 +172,22 @@
   <script src="https://cdn.jsdelivr.net/npm/ethers@6.13.0/dist/ethers.umd.min.js"
           integrity="sha384-JjzOKxQsr+Jhx75Ot1XldVFnWF2UCtB4Ig2JuEcuBt4VAdUG6alucV+sHrYjPn5C"
           crossorigin="anonymous"></script>
+  
+  <script>
+    // About Modal loģika
+    document.getElementById('aboutToggle').addEventListener('click', function() {
+      document.getElementById('aboutOverlay').classList.add('show');
+      document.getElementById('aboutModal').classList.add('show');
+    });
+    document.getElementById('closeAboutModal').addEventListener('click', function() {
+      document.getElementById('aboutOverlay').classList.remove('show');
+      document.getElementById('aboutModal').classList.remove('show');
+    });
+    document.getElementById('aboutOverlay').addEventListener('click', function() {
+      document.getElementById('aboutOverlay').classList.remove('show');
+      document.getElementById('aboutModal').classList.remove('show');
+    });
+  </script>
   
   <script type="module" src="/app.js"></script>
 </body>
