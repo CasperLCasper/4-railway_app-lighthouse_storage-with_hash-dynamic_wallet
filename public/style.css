@@ -281,7 +281,7 @@ button.loading::after {
   display: none;
 }
 
-/* Tooltip for Generate NFT button - white background, black text - SHOWS BELOW the button */
+/* Tooltip for Generate NFT button */
 .generate-nft-btn {
   position: relative;
 }
@@ -308,7 +308,6 @@ button.loading::after {
   letter-spacing: 0.5px;
 }
 
-/* Small arrow for tooltip - points UP (above the tooltip) */
 .generate-nft-btn[data-price]:hover::after {
   content: '';
   position: absolute;
@@ -332,7 +331,7 @@ button.loading::after {
   width: 44px;
   height: 44px;
   border-radius: 50%;
-  border: none;
+  border: 2px solid rgba(255,255,255,0.5);
   background: rgba(255,255,255,0.1);
   color: #fff;
   display: flex;
@@ -343,10 +342,13 @@ button.loading::after {
   transition: all 0.3s ease;
   backdrop-filter: blur(10px);
   font-size: 18px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.3);
 }
 .about-toggle:hover {
-  background: rgba(255,255,255,0.2);
-  transform: scale(1.05);
+  background: rgba(255,255,255,0.25);
+  border-color: rgba(255,255,255,0.8);
+  transform: scale(1.1);
+  box-shadow: 0 0 20px rgba(255,255,255,0.2);
 }
 
 .about-overlay {
@@ -356,16 +358,10 @@ button.loading::after {
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0,0,0,0.7);
+  background: rgba(0,0,0,0.75);
   z-index: 999;
-  opacity: 0;
-  transition: opacity 0.3s ease;
   backdrop-filter: blur(4px);
   -webkit-backdrop-filter: blur(4px);
-}
-.about-overlay.show {
-  display: block;
-  opacity: 1;
 }
 
 .about-modal {
@@ -373,7 +369,7 @@ button.loading::after {
   position: fixed;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%) scale(0.95);
+  transform: translate(-50%, -50%);
   background: #fff;
   padding: 30px;
   border-radius: 16px;
@@ -383,14 +379,7 @@ button.loading::after {
   max-height: 70vh;
   overflow-y: auto;
   box-shadow: 0 25px 80px rgba(0,0,0,0.3);
-  opacity: 0;
-  transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
   color: #000;
-}
-.about-modal.show {
-  display: block;
-  opacity: 1;
-  transform: translate(-50%, -50%) scale(1);
 }
 
 .about-modal-header {
@@ -421,6 +410,7 @@ button.loading::after {
   align-items: center;
   justify-content: center;
   transition: all 0.2s ease;
+  box-shadow: none;
 }
 .about-modal-close:hover {
   background: #f0f0f0;
