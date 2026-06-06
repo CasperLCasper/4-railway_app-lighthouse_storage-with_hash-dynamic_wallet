@@ -13,34 +13,8 @@
   <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
 </head>
 <body>
+  <!-- About poga -->
   <button onclick="document.getElementById('info').style.display='block'" style="position:fixed;top:20px;right:20px;padding:8px 16px;border-radius:8px;border:1px solid rgba(255,255,255,0.5);background:rgba(255,255,255,0.1);color:#fff;font-size:13px;cursor:pointer;z-index:999;font-family:'Inter',Arial,sans-serif;">About</button>
-
-  <div id="info" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;z-index:1000;">
-    <div onclick="document.getElementById('info').style.display='none'" style="position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);"></div>
-    <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:#fff;color:#000;padding:30px;border-radius:12px;max-width:550px;width:90%;max-height:70vh;overflow-y:auto;font-family:'Inter',Arial,sans-serif;">
-      <button onclick="document.getElementById('info').style.display='none'" style="position:absolute;top:12px;right:16px;background:none;border:none;font-size:24px;cursor:pointer;color:#666;padding:0;line-height:1;">&times;</button>
-      <h2 style="font-size:22px;font-weight:600;color:#000;margin-bottom:15px;">About Platform</h2>
-      <p style="line-height:1.6;margin-bottom:12px;font-size:14px;color:#333;">Wallet Visualizer parvērš tavu Ethereum maku unikālā vizuālā mākslā un ļauj to saglabāt kā NFT ar pārbaudāmu autentiskumu.</p>
-      <h3 style="font-size:16px;margin-top:20px;color:#000;font-weight:600;">Kā tas strādā?</h3>
-      <ol style="padding-left:20px;font-size:14px;color:#333;">
-        <li style="padding:3px 0;"><strong>Pieslēdz maku</strong></li>
-        <li style="padding:3px 0;"><strong>Izvēlies blokķēdi</strong></li>
-        <li style="padding:3px 0;"><strong>Nospied "Generate NFT"</strong></li>
-        <li style="padding:3px 0;"><strong>Saņem failus</strong> kā ZIP</li>
-        <li style="padding:3px 0;"><strong>Faili nonāk Lighthouse.storage</strong></li>
-        <li style="padding:3px 0;"><strong>Hash blokķēdē</strong></li>
-      </ol>
-      <h3 style="font-size:16px;margin-top:20px;color:#000;font-weight:600;">Ko tu iegūsti?</h3>
-      <ul style="padding-left:20px;font-size:14px;color:#333;">
-        <li style="padding:3px 0;"><strong>Attēls</strong> — PNG</li>
-        <li style="padding:3px 0;"><strong>Video</strong> — 15s animācija</li>
-        <li style="padding:3px 0;"><strong>Metadati</strong> — JSON</li>
-        <li style="padding:3px 0;"><strong>ZIP arhīvs</strong> — visi faili</li>
-        <li style="padding:3px 0;"><strong>SHA256 hash</strong> — blokķēdē</li>
-      </ul>
-      <p style="margin-top:15px;font-size:14px;color:#333;"><strong>Pieslēdz maku un nospied "Generate NFT"!</strong></p>
-    </div>
-  </div>
 
   <div class="warning-banner" id="warningBanner">
     ⚠️ Please do not close this tab while recording video! ⚠️
@@ -136,6 +110,34 @@
 
   <div id="styleIndicator" class="active-style-indicator">
     <span id="indicatorText">⭐ CLASSIC MODE - Original visualization</span>
+  </div>
+
+  <!-- About Modal (paslēpts, rādās tikai pēc pogas) -->
+  <div id="info" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;z-index:1000;">
+    <div onclick="document.getElementById('info').style.display='none'" style="position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);"></div>
+    <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:#fff;color:#000;padding:30px;border-radius:12px;max-width:550px;width:90%;max-height:70vh;overflow-y:auto;font-family:'Inter',Arial,sans-serif;">
+      <button onclick="document.getElementById('info').style.display='none'" style="position:absolute;top:12px;right:16px;background:none;border:none;font-size:24px;cursor:pointer;color:#666;padding:0;line-height:1;">&times;</button>
+      <h2 style="font-size:22px;font-weight:600;color:#000;margin-bottom:15px;">About Platform</h2>
+      <p style="line-height:1.6;margin-bottom:12px;font-size:14px;color:#333;">Wallet Visualizer parvērš tavu Ethereum maku unikālā vizuālā mākslā un ļauj to saglabāt kā NFT ar pārbaudāmu autentiskumu.</p>
+      <h3 style="font-size:16px;margin-top:20px;color:#000;font-weight:600;">Kā tas strādā?</h3>
+      <ol style="padding-left:20px;font-size:14px;color:#333;">
+        <li style="padding:3px 0;"><strong>Pieslēdz maku</strong></li>
+        <li style="padding:3px 0;"><strong>Izvēlies blokķēdi</strong></li>
+        <li style="padding:3px 0;"><strong>Nospied "Generate NFT"</strong></li>
+        <li style="padding:3px 0;"><strong>Saņem failus</strong> kā ZIP</li>
+        <li style="padding:3px 0;"><strong>Faili nonāk Lighthouse.storage</strong></li>
+        <li style="padding:3px 0;"><strong>Hash blokķēdē</strong></li>
+      </ol>
+      <h3 style="font-size:16px;margin-top:20px;color:#000;font-weight:600;">Ko tu iegūsti?</h3>
+      <ul style="padding-left:20px;font-size:14px;color:#333;">
+        <li style="padding:3px 0;"><strong>Attēls</strong> — PNG</li>
+        <li style="padding:3px 0;"><strong>Video</strong> — 15s animācija</li>
+        <li style="padding:3px 0;"><strong>Metadati</strong> — JSON</li>
+        <li style="padding:3px 0;"><strong>ZIP arhīvs</strong> — visi faili</li>
+        <li style="padding:3px 0;"><strong>SHA256 hash</strong> — blokķēdē</li>
+      </ul>
+      <p style="margin-top:15px;font-size:14px;color:#333;"><strong>Pieslēdz maku un nospied "Generate NFT"!</strong></p>
+    </div>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/ethers@6.13.0/dist/ethers.umd.min.js"
