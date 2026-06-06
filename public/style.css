@@ -325,30 +325,30 @@ button.loading::after {
 }
 
 /* =======================================================
-   JAUNIE STILI: ABOUT POGA UN MODAL (IZLECOŠAIS LOGS)
+   ATJAUNINĀTS: ABOUT POGA UN MODAL (IZLECOŠAIS LOGS)
    ======================================================= */
 
 .about-button {
   position: absolute;
   top: 20px;
   right: 20px;
-  padding: 8px 16px;
+  padding: 10px 22px; /* Padarīta lielāka */
   background: rgba(30, 30, 40, 0.8);
   backdrop-filter: blur(10px);
   color: #fff;
-  border: 1px solid rgba(100, 100, 200, 0.3);
+  border: 1px solid #ffffff; /* Tīri balts rāmis */
   border-radius: 40px;
   cursor: pointer;
   font-family: 'Inter', sans-serif;
   font-weight: 600;
-  font-size: 14px;
+  font-size: 15px; /* Nedaudz lielāks teksts */
   z-index: 150;
   transition: all 0.2s ease;
 }
 
 .about-button:hover {
-  border-color: #0ff;
-  box-shadow: 0 0 12px rgba(0, 255, 255, 0.3);
+  border-color: #ffffff;
+  box-shadow: 0 0 14px rgba(255, 255, 255, 0.5); /* Saglabāts parādīšanās mirdzuma efekts */
   transform: translateY(-2px);
 }
 
@@ -370,7 +370,7 @@ button.loading::after {
   color: #fff;
   margin: 10vh auto;
   padding: 30px;
-  border: 1px solid rgba(0, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.8); /* Tīri balts loga rāmis */
   border-radius: 16px;
   width: 85%;
   max-width: 700px;
@@ -378,15 +378,17 @@ button.loading::after {
   overflow-y: auto;
   position: relative;
   font-family: 'Inter', sans-serif;
-  box-shadow: 0 0 30px rgba(0, 255, 255, 0.1);
+  box-shadow: 0 0 30px rgba(255, 255, 255, 0.15);
 }
 
 .modal-content h2 {
-  font-size: 22px;
+  font-size: 24px;
   margin-top: 0;
-  background: linear-gradient(90deg, #ffffff, #0ff);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  text-align: center; /* Centrēts virsraksts */
+  color: #ffffff;    /* Tīri balta krāsa bez gradientiem un efektiem */
+  -webkit-text-fill-color: initial;
+  background: none;
+  font-weight: 700;
 }
 
 .close-modal {
@@ -401,7 +403,7 @@ button.loading::after {
 }
 
 .close-modal:hover {
-  color: #0ff;
+  color: #ffffff;
 }
 
 @keyframes fadeInModal {
