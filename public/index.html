@@ -10,60 +10,35 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" crossorigin="anonymous" />
   <link rel="stylesheet" href="/style.css" />
   
-  <!-- JSZip CDN priekš ZIP lejupielādes -->
   <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
 </head>
 <body>
-  <!-- About poga -->
   <button onclick="document.getElementById('info').style.display='block'" style="position:fixed;top:20px;right:20px;padding:8px 16px;border-radius:8px;border:1px solid rgba(255,255,255,0.5);background:rgba(255,255,255,0.1);color:#fff;font-size:13px;cursor:pointer;z-index:999;font-family:'Inter',Arial,sans-serif;">About</button>
 
-  <!-- About Modal -->
   <div id="info" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;z-index:1000;">
     <div onclick="document.getElementById('info').style.display='none'" style="position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);"></div>
     <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:#fff;color:#000;padding:30px;border-radius:12px;max-width:550px;width:90%;max-height:70vh;overflow-y:auto;font-family:'Inter',Arial,sans-serif;">
       <button onclick="document.getElementById('info').style.display='none'" style="position:absolute;top:12px;right:16px;background:none;border:none;font-size:24px;cursor:pointer;color:#666;padding:0;line-height:1;">&times;</button>
-      
-      <h2 style="margin-bottom:15px;font-size:22px;font-weight:600;color:#000;">About Platform</h2>
-      
+      <h2 style="font-size:22px;font-weight:600;color:#000;margin-bottom:15px;">About Platform</h2>
       <p style="line-height:1.6;margin-bottom:12px;font-size:14px;color:#333;">Wallet Visualizer parvērš tavu Ethereum maku unikālā vizuālā mākslā un ļauj to saglabāt kā NFT ar pārbaudāmu autentiskumu.</p>
-      <p style="line-height:1.6;margin-bottom:12px;font-size:14px;color:#333;">Pieslēdz savu maku, izvēlies tēmu, un platforma ģenerēs tavu personīgo maka vizualizāciju — attēlu un 15 sekunžu video.</p>
-
       <h3 style="font-size:16px;margin-top:20px;color:#000;font-weight:600;">Kā tas strādā?</h3>
       <ol style="padding-left:20px;font-size:14px;color:#333;">
-        <li style="padding:3px 0;"><strong>Pieslēdz maku</strong> — izmanto jebkuru Web3 maku</li>
-        <li style="padding:3px 0;"><strong>Izvēlies blokķēdi</strong> — atbalstītas vairākas testnet ķēdes</li>
-        <li style="padding:3px 0;"><strong>Nospied "Generate NFT"</strong> — platforma izveidos attēlu, video un metadatus</li>
-        <li style="padding:3px 0;"><strong>Saņem failus</strong> — visi faili tiek saglabāti tavā datorā kā ZIP arhīvs</li>
-        <li style="padding:3px 0;"><strong>Faili nonāk Lighthouse.storage</strong> — decentralizēta glabāšana IPFS + Filecoin</li>
-        <li style="padding:3px 0;"><strong>Hash blokķēdē</strong> — SHA256 hash tiek ierakstīts Base Sepolia līgumā</li>
+        <li style="padding:3px 0;"><strong>Pieslēdz maku</strong></li>
+        <li style="padding:3px 0;"><strong>Izvēlies blokķēdi</strong></li>
+        <li style="padding:3px 0;"><strong>Nospied "Generate NFT"</strong></li>
+        <li style="padding:3px 0;"><strong>Saņem failus</strong> kā ZIP</li>
+        <li style="padding:3px 0;"><strong>Faili nonāk Lighthouse.storage</strong></li>
+        <li style="padding:3px 0;"><strong>Hash blokķēdē</strong></li>
       </ol>
-
       <h3 style="font-size:16px;margin-top:20px;color:#000;font-weight:600;">Ko tu iegūsti?</h3>
       <ul style="padding-left:20px;font-size:14px;color:#333;">
-        <li style="padding:3px 0;"><strong>Attēls</strong> — tava maka vizualizācija PNG formātā</li>
-        <li style="padding:3px 0;"><strong>Video</strong> — 15 sekunžu animācija</li>
-        <li style="padding:3px 0;"><strong>Metadati</strong> — JSON fails ar NFT aprakstu un atribūtiem</li>
-        <li style="padding:3px 0;"><strong>ZIP arhīvs</strong> — visi trīs faili uzreiz tavā datorā</li>
-        <li style="padding:3px 0;"><strong>SHA256 hash blokķēdē</strong> — iespēja jebkad pārbaudīt faila autentiskumu</li>
-        <li style="padding:3px 0;"><strong>Lighthouse.storage</strong> — decentralizēta glabāšana IPFS + Filecoin</li>
+        <li style="padding:3px 0;"><strong>Attēls</strong> — PNG</li>
+        <li style="padding:3px 0;"><strong>Video</strong> — 15s animācija</li>
+        <li style="padding:3px 0;"><strong>Metadati</strong> — JSON</li>
+        <li style="padding:3px 0;"><strong>ZIP arhīvs</strong> — visi faili</li>
+        <li style="padding:3px 0;"><strong>SHA256 hash</strong> — blokķēdē</li>
       </ul>
-
-      <h3 style="font-size:16px;margin-top:20px;color:#000;font-weight:600;">Kāpēc hash ir svarīgs?</h3>
-      <p style="line-height:1.6;margin-bottom:12px;font-size:14px;color:#333;">Katram NFT tiek aprēķināts SHA256 hash — unikāls digitāls pirksta nospiedums.</p>
-      <ul style="padding-left:20px;font-size:14px;color:#333;">
-        <li style="padding:3px 0;">Hash tiek ierakstīts blokķēdē</li>
-        <li style="padding:3px 0;">Jebkurš var pārbaudīt, vai fails atbilst oriģinālam</li>
-        <li style="padding:3px 0;">Pat ja Lighthouse nav pieejams, hash paliek kā pierādījums</li>
-      </ul>
-
-      <h3 style="font-size:16px;margin-top:20px;color:#000;font-weight:600;">Vai faili ir droši?</h3>
-      <ul style="padding-left:20px;font-size:14px;color:#333;">
-        <li style="padding:3px 0;"><strong>Saglabāti tavā datorā</strong> — uzreiz pēc izveides</li>
-        <li style="padding:3px 0;"><strong>Augšupielādēti Lighthouse.storage</strong> — decentralizēta IPFS + Filecoin glabāšana</li>
-        <li style="padding:3px 0;"><strong>Aizsargāti ar hash</strong> — jebkurš fails ir pārbaudāms pret blokķēdi</li>
-      </ul>
-
-      <p style="margin-top:20px;font-size:14px;color:#333;"><strong>Pieslēdz savu maku un nospied "Generate NFT" — pārējo izdarīs platforma.</strong></p>
+      <p style="margin-top:15px;font-size:14px;color:#333;"><strong>Pieslēdz maku un nospied "Generate NFT"!</strong></p>
     </div>
   </div>
 
@@ -106,13 +81,13 @@
       </div>
       <select id="chainSelect" class="chain-dropdown">
         <optgroup label="🪙 Testnet">
-          <option value="sepolia" data-icon="🔷">🔷 Ethereum Sepolia</option>
-          <option value="mumbai" data-icon="🟣">🟣 Polygon Mumbai</option>
-          <option value="bscTestnet" data-icon="🟡">🟡 BNB Chain Testnet</option>
-          <option value="arbitrumSepolia" data-icon="🔵">🔵 Arbitrum Sepolia</option>
-          <option value="optimismSepolia" data-icon="🔴">🔴 Optimism Sepolia</option>
-          <option value="baseSepolia" data-icon="🔷">🔷 Base Sepolia</option>
-          <option value="avalancheFuji" data-icon="🟠">🟠 Avalanche Fuji</option>
+          <option value="sepolia">🔷 Ethereum Sepolia</option>
+          <option value="mumbai">🟣 Polygon Mumbai</option>
+          <option value="bscTestnet">🟡 BNB Chain Testnet</option>
+          <option value="arbitrumSepolia">🔵 Arbitrum Sepolia</option>
+          <option value="optimismSepolia">🔴 Optimism Sepolia</option>
+          <option value="baseSepolia">🔷 Base Sepolia</option>
+          <option value="avalancheFuji">🟠 Avalanche Fuji</option>
         </optgroup>
         <optgroup label="🌟 Mainnet (Coming Soon)">
           <option value="ethereum" disabled>🔷 Ethereum</option>
@@ -135,25 +110,17 @@
     </div>
 
     <div id="accountDisplay">Connected account: —</div>
-    
     <div id="progressBarContainer"><div id="progressBar"></div></div>
     <div id="statusMsg" class="status"></div>
-    
     <div id="recordTimer">Recording: 0 / 15 s</div>
 
     <div class="snapshot-container">
       <canvas id="snapshotCanvas" width="1920" height="1080"></canvas>
       <div id="fullscreenIcon">⤢ Fullscreen</div>
       <div id="toggleInfoIcon">ℹ Info</div>
-      
       <div id="tokenListContainer">
         <table>
-          <thead>
-            <tr>
-              <th>Address</th>
-              <th>Balance</th>
-            </tr>
-          </thead>
+          <thead><tr><th>Address</th><th>Balance</th></tr></thead>
           <tbody id="tokenListContent"></tbody>
         </table>
       </div>
