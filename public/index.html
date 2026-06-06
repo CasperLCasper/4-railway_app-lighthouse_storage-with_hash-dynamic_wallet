@@ -10,6 +10,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" crossorigin="anonymous" />
   <link rel="stylesheet" href="/style.css" />
   
+  <!-- JSZip CDN priekš ZIP lejupielādes -->
   <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
 </head>
 <body>
@@ -81,17 +82,25 @@
     </div>
 
     <div id="accountDisplay">Connected account: —</div>
+    
     <div id="progressBarContainer"><div id="progressBar"></div></div>
     <div id="statusMsg" class="status"></div>
+    
     <div id="recordTimer">Recording: 0 / 15 s</div>
 
     <div class="snapshot-container">
       <canvas id="snapshotCanvas" width="1920" height="1080"></canvas>
       <div id="fullscreenIcon">⤢ Fullscreen</div>
       <div id="toggleInfoIcon">ℹ Info</div>
+      
       <div id="tokenListContainer">
         <table>
-          <thead><tr><th>Address</th><th>Balance</th></tr></thead>
+          <thead>
+            <tr>
+              <th>Address</th>
+              <th>Balance</th>
+            </tr>
+          </thead>
           <tbody id="tokenListContent"></tbody>
         </table>
       </div>
@@ -109,6 +118,12 @@
     <span id="indicatorText">⭐ CLASSIC MODE - Original visualization</span>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/ethers@6.13.0/dist/ethers.umd.min.js"
+          integrity="sha384-JjzOKxQsr+Jhx75Ot1XldVFnWF2UCtB4Ig2JuEcuBt4VAdUG6alucV+sHrYjPn5C"
+          crossorigin="anonymous"></script>
+  
+  <script type="module" src="/app.js"></script>
+
   <button onclick="document.getElementById('aboutModal').style.display='block'" style="position:fixed;top:20px;right:20px;z-index:999;padding:8px 16px;border-radius:8px;border:1px solid #fff;background:rgba(0,0,0,0.6);color:#fff;font-size:13px;cursor:pointer;">About</button>
 
   <div id="aboutModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;z-index:1000;background:rgba(0,0,0,0.7);" onclick="document.getElementById('aboutModal').style.display='none'">
@@ -122,11 +137,5 @@
       <ul><li><strong>Attēls</strong> — PNG</li><li><strong>Video</strong> — 15s animācija</li><li><strong>Metadati</strong> — JSON</li><li><strong>ZIP arhīvs</strong></li><li><strong>SHA256 hash</strong> — blokķēdē</li></ul>
     </div>
   </div>
-
-  <script src="https://cdn.jsdelivr.net/npm/ethers@6.13.0/dist/ethers.umd.min.js"
-          integrity="sha384-JjzOKxQsr+Jhx75Ot1XldVFnWF2UCtB4Ig2JuEcuBt4VAdUG6alucV+sHrYjPn5C"
-          crossorigin="anonymous"></script>
-  
-  <script type="module" src="/app.js"></script>
 </body>
 </html>
