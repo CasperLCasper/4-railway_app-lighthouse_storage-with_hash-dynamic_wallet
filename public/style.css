@@ -32,7 +32,6 @@ h1 { font-size:24px; margin:0; line-height:1; background:linear-gradient(90deg,#
 .theme-rainbow { border-color: #ff00ff; color: #ff00ff; }
 .theme-fire { border-color: #ff4400; color: #ff4400; }
 
-/* Modern Chain Selector */
 .chain-selector {
   display: flex;
   align-items: center;
@@ -261,7 +260,6 @@ button.loading::after {
   #accountDisplay { font-size: 12px; word-break: break-all; }
 }
 
-/* IPFS izskats un slēpšana saknē */
 .ipfs-preview {
   position: fixed;
   bottom: 20px;
@@ -281,7 +279,6 @@ button.loading::after {
   display: none;
 }
 
-/* Tooltip for Generate NFT button */
 .generate-nft-btn {
   position: relative;
 }
@@ -342,13 +339,12 @@ button.loading::after {
   transition: all 0.3s ease;
   backdrop-filter: blur(10px);
   font-size: 18px;
-  box-shadow: 0 0 10px rgba(0,0,0,0.3);
+  box-shadow: none;
 }
 .about-toggle:hover {
   background: rgba(255,255,255,0.25);
   border-color: rgba(255,255,255,0.8);
   transform: scale(1.1);
-  box-shadow: 0 0 20px rgba(255,255,255,0.2);
 }
 
 .about-overlay {
