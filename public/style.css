@@ -32,6 +32,7 @@ h1 { font-size:24px; margin:0; line-height:1; background:linear-gradient(90deg,#
 .theme-rainbow { border-color: #ff00ff; color: #ff00ff; }
 .theme-fire { border-color: #ff4400; color: #ff4400; }
 
+/* Modern Chain Selector */
 .chain-selector {
   display: flex;
   align-items: center;
@@ -260,6 +261,7 @@ button.loading::after {
   #accountDisplay { font-size: 12px; word-break: break-all; }
 }
 
+/* IPFS izskats un slēpšana saknē */
 .ipfs-preview {
   position: fixed;
   bottom: 20px;
@@ -279,6 +281,7 @@ button.loading::after {
   display: none;
 }
 
+/* Tooltip for Generate NFT button - white background, black text - SHOWS BELOW the button */
 .generate-nft-btn {
   position: relative;
 }
@@ -305,6 +308,7 @@ button.loading::after {
   letter-spacing: 0.5px;
 }
 
+/* Small arrow for tooltip - points UP (above the tooltip) */
 .generate-nft-btn[data-price]:hover::after {
   content: '';
   position: absolute;
@@ -318,122 +322,4 @@ button.loading::after {
   pointer-events: none;
   z-index: 1000;
   filter: drop-shadow(0 -1px 1px rgba(0,0,0,0.1));
-}
-
-/* ============ ABOUT MODAL ============ */
-.about-toggle {
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  border: 2px solid rgba(255,255,255,0.5);
-  background: rgba(255,255,255,0.1);
-  color: #fff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  z-index: 100;
-  transition: all 0.3s ease;
-  backdrop-filter: blur(10px);
-  font-size: 18px;
-  box-shadow: none;
-}
-.about-toggle:hover {
-  background: rgba(255,255,255,0.25);
-  border-color: rgba(255,255,255,0.8);
-  transform: scale(1.1);
-}
-
-.about-overlay {
-  display: none;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0,0,0,0.75);
-  z-index: 999;
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
-}
-
-.about-modal {
-  display: none;
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background: #fff;
-  padding: 30px;
-  border-radius: 16px;
-  z-index: 1000;
-  max-width: 560px;
-  width: 90%;
-  max-height: 70vh;
-  overflow-y: auto;
-  box-shadow: 0 25px 80px rgba(0,0,0,0.3);
-  color: #000;
-}
-
-.about-modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-  padding-bottom: 15px;
-  border-bottom: 1px solid #e5e5e5;
-}
-.about-modal-header h2 {
-  margin: 0;
-  font-size: 22px;
-  color: #000;
-  font-weight: 600;
-}
-.about-modal-close {
-  background: none;
-  border: none;
-  color: #666;
-  font-size: 20px;
-  cursor: pointer;
-  padding: 8px;
-  border-radius: 50%;
-  width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s ease;
-  box-shadow: none;
-}
-.about-modal-close:hover {
-  background: #f0f0f0;
-  color: #000;
-}
-
-.about-modal-content {
-  color: #333;
-}
-.about-modal-content p {
-  line-height: 1.6;
-  margin-bottom: 12px;
-  font-size: 14px;
-}
-.about-modal-content h3 {
-  font-size: 16px;
-  margin-top: 20px;
-  margin-bottom: 8px;
-  color: #000;
-  font-weight: 600;
-}
-.about-modal-content ul,
-.about-modal-content ol {
-  padding-left: 20px;
-  font-size: 14px;
-}
-.about-modal-content li {
-  padding: 3px 0;
-  line-height: 1.5;
 }
