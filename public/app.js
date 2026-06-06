@@ -393,6 +393,31 @@ const App = Object.assign({}, AppState, {
       }
       if (this.showInfo) updateTokenListUI(this.tokens); 
     });
+
+    // ============================================ //
+    // JAUNUMS: LOGA FUNKCIONALITĀTE (ABOUT MODAL) //
+    // ============================================ //
+    const modal = document.getElementById("aboutModal");
+    const aboutBtn = document.getElementById("aboutBtn");
+    const closeBtn = document.querySelector(".close-modal");
+
+    if (aboutBtn && modal && closeBtn) {
+      aboutBtn.addEventListener("click", () => {
+        modal.style.display = "block";
+      });
+
+      closeBtn.addEventListener("click", () => {
+        modal.style.display = "none";
+      });
+
+      window.addEventListener("click", (event) => {
+        if (event.target === modal) {
+          modal.style.display = "none";
+        }
+      });
+    } else {
+      console.warn("⚠️ About modal elements were not found in the DOM.");
+    }
     
     window.addEventListener('resize', () => resizeCanvas(this));
     
