@@ -395,7 +395,7 @@ const App = Object.assign({}, AppState, {
     });
 
     // ============================================ //
-    // JAUNUMS: LOGA FUNKCIONALITĀTE (ABOUT MODAL) //
+    // LOGA FUNKCIONALITĀTE (ABOUT MODAL)          //
     // ============================================ //
     const modal = document.getElementById("aboutModal");
     const aboutBtn = document.getElementById("aboutBtn");
