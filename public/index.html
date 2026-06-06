@@ -18,18 +18,18 @@
 </head>
 <body>
   <!-- About poga -->
-  <button class="about-toggle" id="aboutToggle" aria-label="About Platform">
+  <button class="about-toggle" onclick="document.getElementById('aboutOverlay').style.display='block'; document.getElementById('aboutModal').style.display='block';" aria-label="About Platform">
     <i class="fas fa-info"></i>
   </button>
 
   <!-- About Modal Overlay -->
-  <div class="about-overlay" id="aboutOverlay"></div>
+  <div class="about-overlay" id="aboutOverlay" onclick="document.getElementById('aboutOverlay').style.display='none'; document.getElementById('aboutModal').style.display='none';"></div>
   
   <!-- About Modal -->
   <div class="about-modal" id="aboutModal">
     <div class="about-modal-header">
       <h2>About Platform</h2>
-      <button class="about-modal-close" id="closeAboutModal" aria-label="Aizvērt">
+      <button class="about-modal-close" onclick="document.getElementById('aboutOverlay').style.display='none'; document.getElementById('aboutModal').style.display='none';" aria-label="Aizvērt">
         <i class="fas fa-times"></i>
       </button>
     </div>
@@ -174,22 +174,6 @@
   <script src="https://cdn.jsdelivr.net/npm/ethers@6.13.0/dist/ethers.umd.min.js"
           integrity="sha384-JjzOKxQsr+Jhx75Ot1XldVFnWF2UCtB4Ig2JuEcuBt4VAdUG6alucV+sHrYjPn5C"
           crossorigin="anonymous"></script>
-  
-  <script>
-    // About Modal
-    document.getElementById('aboutToggle').addEventListener('click', function() {
-      document.getElementById('aboutOverlay').classList.add('show');
-      document.getElementById('aboutModal').classList.add('show');
-    });
-    document.getElementById('closeAboutModal').addEventListener('click', function() {
-      document.getElementById('aboutOverlay').classList.remove('show');
-      document.getElementById('aboutModal').classList.remove('show');
-    });
-    document.getElementById('aboutOverlay').addEventListener('click', function() {
-      document.getElementById('aboutOverlay').classList.remove('show');
-      document.getElementById('aboutModal').classList.remove('show');
-    });
-  </script>
   
   <script type="module" src="/app.js"></script>
 </body>
