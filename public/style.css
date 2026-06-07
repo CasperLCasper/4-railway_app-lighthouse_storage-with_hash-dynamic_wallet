@@ -37,7 +37,7 @@ h1 {
 }
 
 /* =======================================================
-   TĒMU UN BLOKĶĒŽU SELEKTORI
+   TĒMU UN BLOKĶEZU SELEKTORI
    ======================================================= */
 .theme-selector {
   display: flex;
@@ -357,7 +357,7 @@ button.loading::after {
 .ipfs-preview a { color: #0ff; word-break: break-all; }
 
 /* =======================================================
-   ABOUT POGA UN MODAL (IZLECOŠAIS LOGS) - GRĀMATU REŽĪMS
+   ABOUT POGA UN MODAL (IZLECOŠAIS LOGS) - SOLARIZED LIGHT
    ======================================================= */
 .about-button {
   position: absolute;
@@ -391,55 +391,55 @@ button.loading::after {
   top: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.7); /* Tumšāks fons aizmugurē labākam fokusam */
-  backdrop-filter: blur(6px);
+  background-color: rgba(7, 54, 66, 0.5); /* Maigi tumšs, dzeltenzaļgans pārklājums */
+  backdrop-filter: blur(5px);
   animation: fadeInModal 0.3s ease;
 }
 
 .modal-content {
-  background: #fbf0db;       /* GRĀMATAS PAPĪRA FONS */
-  color: #2c2421;            /* MAIGS, TUMŠI BRŪNS TEKSTS */
+  background: #fdf6e3;       /* SOLARIZED LIGHT FONS (Base3) */
+  color: #586e75;            /* SOLARIZED PELĒKAIS PAMATTEKSTAM (Base01) */
   margin: 10vh auto;
   padding: 30px;
-  border: 2px solid #5b4636; /* Pieskaņota, tumšāka apmale */
-  border-radius: 0;          /* STRIKTAS ASAS MALAS STŪRIEM */
+  border: 2px solid #073642; /* Dziļa zilganzaļa apmale (Base02) */
+  border-radius: 0;          /* STRIKTAS ASAS MALAS */
   width: 85%;
   max-width: 700px;
   max-height: 80vh;
   overflow-y: auto;
   position: relative;
   font-family: 'Inter', sans-serif;
-  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 15px 40px rgba(7, 54, 66, 0.25);
 }
 
 .modal-content h2 {
   font-size: 24px;
   margin-top: 0;
   text-align: center;
-  color: #2c2421; 
+  color: #073642;            /* Dziļš Solarized virsraksts (Base02) */
   background: none;
   font-weight: 700;
-  border-bottom: 2px solid #dfd3ba; /* Smalka līnija grāmatas stilā */
+  border-bottom: 2px solid #eee8d5; /* Kalibrēta Solarized līnija (Base2) */
   padding-bottom: 12px;
 }
 
 .modal-content h3 {
-  color: #5b4636; /* Siltāks tonis apakšvirsrakstiem */
+  color: #b58900;            /* Solarized dzeltenais/zelta akcents apakšvirsrakstiem */
   margin-top: 24px;
   font-weight: 700;
 }
 
 .modal-content p, .modal-content li {
   line-height: 1.6;
-  color: #42342b; /* Patīkami lasāms un kontrastējošs teksts */
+  color: #586e75;            /* Maigs un kontrastējošs teksts acīm */
 }
 
 .modal-content strong {
-  color: #1a1412; /* Svarīgie akcenti ir nedaudz tumšāki */
+  color: #073642;            /* Izceltie vārdi ir tumšāki un skaidri saskatāmi */
 }
 
 .close-modal {
-  color: #8c7667;
+  color: #93a1a1;            /* Maiga aizvēršanas poga (Base1) */
   position: absolute;
   top: 15px;
   right: 20px;
@@ -451,7 +451,7 @@ button.loading::after {
 }
 
 .close-modal:hover {
-  color: #2c2421;
+  color: #dc322f;            /* Solarized sarkanā krāsa, kad uzbrauc ar peli */
 }
 
 @keyframes fadeInModal {
