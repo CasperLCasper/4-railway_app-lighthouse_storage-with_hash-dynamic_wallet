@@ -364,24 +364,25 @@ button.loading::after {
   top: 20px;
   right: 20px;
   padding: 10px 24px;
-  background: rgba(255, 255, 255, 0.08); /* Gluds fons bez liekām apmalēm */
+  background: rgba(255, 255, 255, 0.1); 
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   color: #ffffff;
-  border: none;                           /* Pilnībā noņemts jocīgais rāmītis */
+  border: none;
   border-radius: 40px;
   cursor: pointer;
   font-family: 'Inter', sans-serif;
   font-weight: 600;
   font-size: 15px;
   z-index: 150;
-  transition: all 0.2s ease;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); /* Plūstoša un patīkama pāreja */
 }
 
 .about-button:hover {
-  background: rgba(255, 255, 255, 0.15); /* Poga eleganti izgaismojas */
-  box-shadow: 0 4px 20px rgba(255, 255, 255, 0.1);
-  transform: translateY(-2px);
+  background: #ffffff;                                /* Poga pilnībā iekrāsojas balta */
+  color: #000000;                                     /* Teksts kļūst izteiksmīgi melns */
+  box-shadow: 0 0 25px rgba(255, 255, 255, 0.4);       /* Spēcīgs un elegants mirdzums */
+  transform: scale(1.08) translateY(-1px);            /* Izteiksmīga palielināšanās un pacelšanās */
 }
 
 .modal {
@@ -398,12 +399,12 @@ button.loading::after {
 }
 
 .modal-content {
-  background: #f8fafc;       /* GAIŠS, DZIDRS UN MAIGS FONS (Slate 50) */
-  color: #334155;            /* MODERNI PELĒKS PAMATTEKSTS (Slate 700) */
+  background: #f8fafc;       
+  color: #334155;            
   margin: 10vh auto;
   padding: 35px;             
   border: 1px solid #e2e8f0; 
-  border-radius: 0;          /* STRIKTAS ASAS MALAS STŪRIEM */
+  border-radius: 0;          
   width: 85%;
   max-width: 720px;          
   max-height: 80vh;
@@ -414,10 +415,10 @@ button.loading::after {
 }
 
 .modal-content h2 {
-  font-size: 25px;           /* Palielināts galvenais virsraksts */
+  font-size: 25px;           
   margin-top: 0;
   text-align: center;
-  color: #0f172a;            /* Dziļš, gandrīz melns virsraksts (Slate 900) */
+  color: #0f172a;            
   background: none;
   font-weight: 700;
   letter-spacing: -0.5px;
@@ -429,12 +430,12 @@ button.loading::after {
   color: #1e293b;            
   margin-top: 26px;
   font-weight: 600;
-  font-size: 19px;           /* Palielināti apakšvirsraksti */
+  font-size: 19px;           
 }
 
 .modal-content p, .modal-content li {
   line-height: 1.65;        
-  font-size: 17px;           /* Palielināts pamatteksta izmērs (17px) */
+  font-size: 17px;           
   color: #334155;            
 }
 
