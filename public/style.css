@@ -37,7 +37,7 @@ h1 {
 }
 
 /* =======================================================
-   TĒMU UN BLOKĶĒŽU SELEKTORI
+   TĒMU UN BLOKĶEZU SELEKTORI
    ======================================================= */
 .theme-selector {
   display: flex;
@@ -363,7 +363,7 @@ button.loading::after {
   position: absolute;
   top: 20px;
   right: 20px;
-  padding: 10px 24px;
+  padding: 12px 28px;                                 /* Palielinātas iekšējās malas */
   background: rgba(255, 255, 255, 0.1); 
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
@@ -373,16 +373,17 @@ button.loading::after {
   cursor: pointer;
   font-family: 'Inter', sans-serif;
   font-weight: 600;
-  font-size: 15px;
+  font-size: 17px;                                    /* Palielināts fonta izmērs pogai */
   z-index: 150;
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); /* Plūstoša un patīkama pāreja */
+  letter-spacing: 0.3px;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); 
 }
 
 .about-button:hover {
-  background: #ffffff;                                /* Poga pilnībā iekrāsojas balta */
-  color: #000000;                                     /* Teksts kļūst izteiksmīgi melns */
-  box-shadow: 0 0 25px rgba(255, 255, 255, 0.4);       /* Spēcīgs un elegants mirdzums */
-  transform: scale(1.08) translateY(-1px);            /* Izteiksmīga palielināšanās un pacelšanās */
+  background: #ffffff;                                
+  color: #000000;                                     
+  box-shadow: 0 0 30px rgba(255, 255, 255, 0.55);     /* Spēcīgāks, pamanāmāks mirdzums */
+  transform: scale(1.10) translateY(-2px);            /* Izteiktāks mērogs uzslīdot */
 }
 
 .modal {
@@ -482,6 +483,8 @@ button.loading::after {
     margin: 10px auto;
     display: block;
     width: fit-content;
+    padding: 10px 24px;
+    font-size: 15px;
   }
   .modal-content {
     margin: 5vh auto;
