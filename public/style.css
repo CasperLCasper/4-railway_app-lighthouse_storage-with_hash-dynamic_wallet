@@ -37,7 +37,7 @@ h1 {
 }
 
 /* =======================================================
-   TĒMU UN BLOKĶEZU SELEKTORI
+   TĒMU UN BLOKĶĒŽU SELEKTORI
    ======================================================= */
 .theme-selector {
   display: flex;
@@ -357,7 +357,7 @@ button.loading::after {
 .ipfs-preview a { color: #0ff; word-break: break-all; }
 
 /* =======================================================
-   ABOUT POGA UN MODAL (IZLECOŠAIS LOGS) - SOLARIZED LIGHT
+   ABOUT POGA UN MODAL (IZLECOŠAIS LOGS) - MODERN CHAT REŽĪMS
    ======================================================= */
 .about-button {
   position: absolute;
@@ -367,7 +367,7 @@ button.loading::after {
   background: rgba(30, 30, 40, 0.8);
   backdrop-filter: blur(10px);
   color: #fff;
-  border: 1px solid #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 40px;
   cursor: pointer;
   font-family: 'Inter', sans-serif;
@@ -379,7 +379,7 @@ button.loading::after {
 
 .about-button:hover {
   border-color: #ffffff;
-  box-shadow: 0 0 14px rgba(255, 255, 255, 0.5);
+  box-shadow: 0 0 14px rgba(255, 255, 255, 0.15);
   transform: translateY(-2px);
 }
 
@@ -391,72 +391,76 @@ button.loading::after {
   top: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(7, 54, 66, 0.5); /* Maigi tumšs, dzeltenzaļgans pārklājums */
-  backdrop-filter: blur(5px);
-  animation: fadeInModal 0.3s ease;
+  background-color: rgba(15, 17, 23, 0.6); /* Moderns, tumšs pārklājums */
+  backdrop-filter: blur(8px); /* Smalkāks aizmiglojums fonam */
+  animation: fadeInModal 0.2s ease-out;
 }
 
 .modal-content {
-  background: #fdf6e3;       /* SOLARIZED LIGHT FONS (Base3) */
-  color: #586e75;            /* SOLARIZED PELĒKAIS PAMATTEKSTAM (Base01) */
+  background: #f8fafc;       /* GAIŠS, DZIDRS UN MAIGS FONS (Slate 50) */
+  color: #334155;            /* MODERNI PELĒKS PAMATTEKSTS (Slate 700) */
   margin: 10vh auto;
-  padding: 30px;
-  border: 2px solid #073642; /* Dziļa zilganzaļa apmale (Base02) */
-  border-radius: 0;          /* STRIKTAS ASAS MALAS */
+  padding: 32px;
+  border: 1px solid #e2e8f0; /* Smalka, tīra apmale (Slate 200) */
+  border-radius: 0;          /* STRIKTAS ASAS MALAS STŪRIEM */
   width: 85%;
-  max-width: 700px;
+  max-width: 680px;
   max-height: 80vh;
   overflow-y: auto;
   position: relative;
-  font-family: 'Inter', sans-serif;
-  box-shadow: 0 15px 40px rgba(7, 54, 66, 0.25);
+  font-family: 'Inter', sans-serif; /* Tīrais, modernais fonts */
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
 }
 
 .modal-content h2 {
-  font-size: 24px;
+  font-size: 22px;
   margin-top: 0;
   text-align: center;
-  color: #073642;            /* Dziļš Solarized virsraksts (Base02) */
+  color: #0f172a;            /* Dziļš, gandrīz melns virsraksts (Slate 900) */
   background: none;
   font-weight: 700;
-  border-bottom: 2px solid #eee8d5; /* Kalibrēta Solarized līnija (Base2) */
-  padding-bottom: 12px;
+  letter-spacing: -0.5px;
+  border-bottom: 1px solid #e2e8f0; 
+  padding-bottom: 16px;
 }
 
 .modal-content h3 {
-  color: #b58900;            /* Solarized dzeltenais/zelta akcents apakšvirsrakstiem */
+  color: #1e293b;            /* Izteiksmīgs apakšvirsraksts (Slate 800) */
   margin-top: 24px;
-  font-weight: 700;
+  font-weight: 600;
+  font-size: 16px;
 }
 
 .modal-content p, .modal-content li {
-  line-height: 1.6;
-  color: #586e75;            /* Maigs un kontrastējošs teksts acīm */
+  line-height: 1.625;        /* Perfekts rindu augstums lasīšanai */
+  font-size: 15px;
+  color: #334155;            
 }
 
 .modal-content strong {
-  color: #073642;            /* Izceltie vārdi ir tumšāki un skaidri saskatāmi */
+  color: #0f172a;            /* Svarīgie akcenti izceļas dabiski */
+  font-weight: 600;
 }
 
 .close-modal {
-  color: #93a1a1;            /* Maiga aizvēršanas poga (Base1) */
+  color: #94a3b8;            /* Pelēka, neuzbāzīga aizvēršanas zīme */
   position: absolute;
-  top: 15px;
-  right: 20px;
-  font-size: 32px;
-  font-weight: bold;
+  top: 20px;
+  right: 24px;
+  font-size: 26px;
+  font-weight: 400;
   cursor: pointer;
-  transition: color 0.2s;
+  transition: color 0.15s ease;
   line-height: 1;
 }
 
 .close-modal:hover {
-  color: #dc322f;            /* Solarized sarkanā krāsa, kad uzbrauc ar peli */
+  color: #0f172a;            /* Paliek tumša, kad uzbrauc ar peli */
 }
 
 @keyframes fadeInModal {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from { opacity: 0; transform: scale(0.98); }
+  to { opacity: 1; transform: scale(1); }
 }
 
 /* =======================================================
@@ -480,6 +484,6 @@ button.loading::after {
   .modal-content {
     margin: 5vh auto;
     width: 90%;
-    padding: 20px;
+    padding: 24px;
   }
 }
