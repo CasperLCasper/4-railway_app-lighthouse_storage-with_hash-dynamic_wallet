@@ -13,7 +13,7 @@ const getChainConfig = (chain, apiKey) => {
     },
     mumbai: {
       type: 'alchemy',
-      url: `https://polygon-mumbai.g.alchemy.com/v2/${apiKey}`,
+      url: `https://polygon-amoy.g.alchemy.com/v2/${apiKey}`, // SALABOTS: nomainīts uz amoy
       method: 'alchemy_getTokenBalances'
     },
     bscTestnet: {
