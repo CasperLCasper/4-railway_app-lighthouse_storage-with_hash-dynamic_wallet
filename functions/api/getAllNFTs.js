@@ -3,11 +3,11 @@ import { getOptionalUser } from "../_lib/auth.js";
 import { getCache, setCache } from "../_lib/cache.js";
 import { checkRateLimit } from "../_lib/rateLimit.js";
 
-// Chain konfigurācija paliek nemainīga
+// Chain konfigurācija paliek nemainīga, bet salabota uz aktīvo testnetu
 const getChainConfig = (chain) => {
   const configs = {
     sepolia: { type: 'alchemy', network: 'eth-sepolia' },
-    mumbai: { type: 'alchemy', network: 'polygon-mumbai' },
+    mumbai: { type: 'alchemy', network: 'polygon-amoy' }, // SALABOTS: nomainīts uz polygon-amoy
     bscTestnet: { type: 'bscscan', network: 'bsc-testnet' },
     arbitrumSepolia: { type: 'alchemy', network: 'arb-sepolia' },
     optimismSepolia: { type: 'alchemy', network: 'opt-sepolia' },
