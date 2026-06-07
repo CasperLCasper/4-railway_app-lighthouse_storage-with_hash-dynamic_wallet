@@ -4,9 +4,9 @@
 
 import { AppState, initUI, UI } from './modules/state.js';
 import { VIZ_CHAINS, MINT_CHAIN } from './modules/chains.js';
-import { LIGHTHOUSE_GATEWAY, CONTRACT_ABI, LOW_POWER_MODE } from './modules/config.js';
+import { LIGHTHOUSE_GATEWAY, CONTRACT_ABI, LOW_POWER_MODE, getMintProvider } from './modules/config.js'; // ✅ SALABOTS: getMintProvider importēts no config.js
 import { showToast, setButtonLoading, updateTokenListUI, hideProgress, showProgress } from './modules/ui.js';
-import { login, getNFTPrice, getContractAddress, getMintProvider } from './modules/api.js';
+import { login, getNFTPrice, getContractAddress } from './modules/api.js'; // ✅ SALABOTS: Noņemts neeksistējošais imports no api.js
 import { connectWallet, updateChainStatus, switchToMintChain, switchToVizChain } from './modules/web3.js';
 import { 
   uploadImageToIPFS, uploadVideoToIPFS, uploadMetadataToIPFS, 
@@ -122,8 +122,8 @@ const App = Object.assign({}, AppState, {
     try {
       await switchToMintChain();
       
-      // ✅ SALABOTS: Pievienojam mazu pauzi, lai maks paspēj pārslēgt iekšējo stāvokli
-      await new Promise(resolve => setTimeout(resolve, 500));
+      // Mazs buferis, lai window.ethereum paspēj pārslēgties
+      await new Promise(resolve => setTimeout(resolve, 400));
       
       this.provider = new ethers.BrowserProvider(window.ethereum);
       this.signer = await this.provider.getSigner();
@@ -140,7 +140,6 @@ const App = Object.assign({}, AppState, {
       let mintPriceEth = "?";
       if (contractAddress) {
         try {
-          // ✅ UZLABOTS: Izmantojam stabilu Mint Provideri cenas nolasīšanai
           const stableProvider = await getMintProvider();
           const contract = new ethers.Contract(contractAddress, CONTRACT_ABI, stableProvider);
           const priceWei = await contract.mintPrice();
