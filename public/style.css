@@ -1,8 +1,44 @@
-body { font-family:'Inter',Arial,sans-serif; background:#000; color:#fff; margin:0; padding:20px; position: relative; }
-.container { max-width:1400px; margin:auto; display:flex; flex-direction:column; align-items:center; gap:12px; }
-h1 { font-size:24px; margin:0; line-height:1; background:linear-gradient(90deg,#ffffff,#aaaaaa); -webkit-background-clip:text; -webkit-text-fill-color:transparent; text-align:center; }
-.subtitle { margin-top:4px; color:#9fb0c3; font-size:18px; text-align:center; }
+/* =======================================================
+   GLOBALIE UN PAMATA STILI (TUMŠĀ TĒMA)
+   ======================================================= */
+body { 
+  font-family: 'Inter', Arial, sans-serif; 
+  background: #000; 
+  color: #fff; 
+  margin: 0; 
+  padding: 20px; 
+  position: relative; 
+}
 
+.container { 
+  max-width: 1400px; 
+  margin: auto; 
+  display: flex; 
+  flex-direction: column; 
+  align-items: center; 
+  gap: 12px; 
+}
+
+h1 { 
+  font-size: 24px; 
+  margin: 0; 
+  line-height: 1; 
+  background: linear-gradient(90deg, #ffffff, #aaaaaa); 
+  -webkit-background-clip: text; 
+  -webkit-text-fill-color: transparent; 
+  text-align: center; 
+}
+
+.subtitle { 
+  margin-top: 4px; 
+  color: #9fb0c3; 
+  font-size: 18px; 
+  text-align: center; 
+}
+
+/* =======================================================
+   TĒMU UN BLOKĶĒŽU SELEKTORI
+   ======================================================= */
 .theme-selector {
   display: flex;
   gap: 12px;
@@ -10,6 +46,7 @@ h1 { font-size:24px; margin:0; line-height:1; background:linear-gradient(90deg,#
   margin: 10px 0;
   flex-wrap: wrap;
 }
+
 .theme-btn {
   padding: 8px 16px;
   border-radius: 20px;
@@ -18,11 +55,12 @@ h1 { font-size:24px; margin:0; line-height:1; background:linear-gradient(90deg,#
   font-weight: 600;
   font-size: 14px;
   transition: all 0.2s ease;
-  background: rgba(0,0,0,0.6);
+  background: rgba(0, 0, 0, 0.6);
   backdrop-filter: blur(4px);
 }
+
 .theme-btn:hover { transform: translateY(-2px) scale(1.05); }
-.theme-btn.active { background: rgba(255,255,255,0.2); box-shadow: 0 0 15px currentColor; transform: scale(1.02); }
+.theme-btn.active { background: rgba(255, 255, 255, 0.2); box-shadow: 0 0 15px currentColor; transform: scale(1.02); }
 .theme-btn.active::before { content: '✓ '; font-weight: bold; }
 .theme-classic { border-color: #0ff; color: #0ff; }
 .theme-forest { border-color: #0f0; color: #0f0; }
@@ -32,7 +70,6 @@ h1 { font-size:24px; margin:0; line-height:1; background:linear-gradient(90deg,#
 .theme-rainbow { border-color: #ff00ff; color: #ff00ff; }
 .theme-fire { border-color: #ff4400; color: #ff4400; }
 
-/* Modern Chain Selector */
 .chain-selector {
   display: flex;
   align-items: center;
@@ -62,9 +99,7 @@ h1 { font-size:24px; margin:0; line-height:1; background:linear-gradient(90deg,#
   letter-spacing: 0.5px;
 }
 
-.chain-label svg {
-  color: #0ff;
-}
+.chain-label svg { color: #0ff; }
 
 .chain-dropdown {
   background: rgba(0, 0, 0, 0.6);
@@ -85,18 +120,8 @@ h1 { font-size:24px; margin:0; line-height:1; background:linear-gradient(90deg,#
   box-shadow: 0 0 8px rgba(0, 255, 255, 0.3);
 }
 
-.chain-dropdown option {
-  background: #1a1a2e;
-  color: #fff;
-  padding: 10px;
-}
-
-.chain-dropdown optgroup {
-  background: #0f0f1a;
-  color: #0ff;
-  font-weight: 600;
-  padding: 8px;
-}
+.chain-dropdown option { background: #1a1a2e; color: #fff; padding: 10px; }
+.chain-dropdown optgroup { background: #0f0f1a; color: #0ff; font-weight: 600; padding: 8px; }
 
 .chain-status {
   width: 12px;
@@ -138,19 +163,35 @@ h1 { font-size:24px; margin:0; line-height:1; background:linear-gradient(90deg,#
   font-family: monospace;
 }
 
-.controls { display:flex; gap:10px; flex-wrap:wrap; justify-content:center; }
-button { padding:12px 20px; border-radius:12px; border:none; cursor:pointer; background:linear-gradient(90deg,#4a90e2,#9013fe); color:#fff; font-weight:700; font-size:16px; box-shadow:0 6px 18px rgba(0,0,0,0.45); transition: transform 0.2s, box-shadow 0.2s; }
-button:disabled { background:#444; cursor:not-allowed; opacity:0.5; }
-button:hover:not(:disabled) { transform:translateY(-4px) scale(1.03); box-shadow:0 8px 22px rgba(0,0,0,0.65); }
+/* =======================================================
+   POGAS UN KONTROLES
+   ======================================================= */
+.controls { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
 
+button { 
+  padding: 12px 20px; 
+  border-radius: 12px; 
+  border: none; 
+  cursor: pointer; 
+  background: linear-gradient(90deg, #4a90e2, #9013fe); 
+  color: #fff; 
+  font-weight: 700; 
+  font-size: 16px; 
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45); 
+  transition: transform 0.2s, box-shadow 0.2s; 
+}
+
+button:disabled { background: #444; cursor: not-allowed; opacity: 0.5; }
+button:hover:not(:disabled) { transform: translateY(-4px) scale(1.03); box-shadow: 0 8px 22px rgba(0, 0, 0, 0.65); }
 button.loading { opacity: 0.7; cursor: wait; transform: none !important; }
+
 button.loading::after {
   content: '';
   display: inline-block;
   width: 14px;
   height: 14px;
   margin-left: 10px;
-  border: 2px solid rgba(255,255,255,0.3);
+  border: 2px solid rgba(255, 255, 255, 0.3);
   border-top-color: white;
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
@@ -160,131 +201,10 @@ button.loading::after {
 @keyframes spin { to { transform: rotate(360deg); } }
 
 .generate-nft-btn { background: linear-gradient(135deg, #ffffff, #e8f4f0); color: #000; }
-.generate-nft-btn:hover:not(:disabled) { background: linear-gradient(135deg, #d4fcec, #b8f5e0); color: #000; box-shadow: 0 8px 22px rgba(0,255,204,0.2); }
-
-.snapshot-container { width:100%; background:#000; border-radius:14px; padding:18px; box-shadow:0 12px 40px rgba(0,0,0,0.6); position:relative; }
-#snapshotCanvas { width:100%; border-radius:10px; border:1px solid rgba(255,255,255,0.03); display:block; margin-bottom:12px; }
-#recordTimer { margin-top:6px; color:#0ff; font-weight:600; font-size:16px; text-align:center; }
-
-#statusMsg {
-  font-weight: 600;
-  font-size: 16px;
-  color: #fff;
-  text-align: center;
-  margin-top: 8px;
-  padding: 8px;
-  background: rgba(0,0,0,0.5);
-  border-radius: 12px;
-  max-width: 90%;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-#progressBarContainer {
-  width: 100%;
-  max-width: 400px;
-  margin: 0 auto;
-  height: 18px;
-  background: rgba(255,255,255,0.1);
-  border-radius: 6px;
-  overflow: hidden;
-  display: none;
-}
-
-#progressBar {
-  height: 100%;
-  width: 100%;
-  background: linear-gradient(90deg, #0ff, #4a90e2);
-  border-radius: 6px;
-  transform: scaleX(0);
-  transform-origin: left center;
-  transition: transform 0.4s ease;
-}
-
-#fullscreenIcon { position:absolute; top:10px; right:10px; display:flex; align-items:center; cursor:pointer; color:#0ff; background:rgba(0,0,0,0.3); border-radius:6px; padding:6px 10px; transition: background 0.2s, transform 0.2s; z-index:10; }
-#fullscreenIcon:hover { background:rgba(0,255,255,0.2); transform: scale(1.05); }
-#toggleInfoIcon { position:absolute; top:10px; left:10px; display:flex; align-items:center; cursor:pointer; color:#0ff; background:rgba(0,0,0,0.3); border-radius:6px; padding:6px 10px; transition: background 0.2s, transform 0.2s; z-index:10; }
-#toggleInfoIcon:hover { background:rgba(0,255,255,0.2); transform: scale(1.05); }
-#accountDisplay { width:100%; word-break:break-word; margin-top:8px; font-size:16px; text-align:center; font-family: monospace; }
-
-#tokenListContainer {
-  display:none;
-  position:absolute;
-  top:80px;
-  left:10px;
-  max-height:150px;
-  width:90%;
-  max-width:576px;
-  background:rgba(0,0,0,0.5);
-  border-radius:9px;
-  overflow-y:auto;
-  padding:10px;
-  font-size:14px;
-  z-index:15;
-}
-#tokenListContainer table { width:100%; border-collapse:collapse; }
-#tokenListContainer th, #tokenListContainer td { padding:6px 8px; text-align:left; font-size:13px; }
-#tokenListContainer th { color:#0ff; font-weight:600; }
-#tokenListContainer tr:nth-child(even) td { background:rgba(255,255,255,0.05); }
-#tokenListContainer tr:nth-child(odd) td { background:rgba(255,255,255,0.02); }
-#tokenListContainer::-webkit-scrollbar { width:6px; }
-#tokenListContainer::-webkit-scrollbar-thumb { background:#0ff; border-radius:3px; }
-
-.warning-banner {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  background: #f59e0b;
-  color: #000;
-  text-align: center;
-  padding: 8px;
-  font-size: 12px;
-  font-weight: 600;
-  z-index: 200;
-  transform: translateY(-100%);
-  transition: transform 0.3s ease;
-}
-.warning-banner.show { transform: translateY(0); }
-
-.site-header { position: relative; width: 100%; min-height: 80px; }
-.logo { position: absolute; top: 0px; left: 10px; width: 280px; height: auto; }
-.header-text { text-align: center; padding-top: 5px; }
-
-@media (max-width: 768px) {
-  .logo { position: static; display: block; margin: 0 auto 20px auto; width: 140px; }
-  .header-text { padding-top: 0; }
-  .site-header { min-height: auto; }
-  .chain-selector { flex-wrap: wrap; justify-content: center; gap: 10px; }
-  #tokenListContainer { max-width: calc(100% - 40px); left: 20px; right: 20px; top: 100px; }
-  #progressBarContainer { width: 90%; }
-  #accountDisplay { font-size: 12px; word-break: break-all; }
-}
-
-/* IPFS izskats un slēpšana saknē */
-.ipfs-preview {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  background: rgba(0,0,0,0.8);
-  border: 1px solid #0ff;
-  border-radius: 8px;
-  padding: 10px;
-  font-size: 11px;
-  max-width: 300px;
-  z-index: 100;
-  display: none; 
-}
-.ipfs-preview a { color: #0ff; word-break: break-all; }
-
-#renderBtn {
-  display: none;
-}
+.generate-nft-btn:hover:not(:disabled) { background: linear-gradient(135deg, #d4fcec, #b8f5e0); color: #000; box-shadow: 0 8px 22px rgba(0, 255, 204, 0.2); }
 
 /* Tooltip for Generate NFT button */
-.generate-nft-btn {
-  position: relative;
-}
+.generate-nft-btn { position: relative; }
 
 .generate-nft-btn[data-price]:hover::before {
   content: attr(data-price);
@@ -320,13 +240,125 @@ button.loading::after {
   margin-top: 4px;
   pointer-events: none;
   z-index: 1000;
-  filter: drop-shadow(0 -1px 1px rgba(0,0,0,0.1));
+  filter: drop-shadow(0 -1px 1px rgba(0, 0, 0, 0.1));
 }
 
-/* =======================================================
-   ABOUT POGA UN MODAL (IZLECOŠAIS LOGS) - ACĪM DRAUDZĪGS
-   ======================================================= */
+#renderBtn { display: none; }
 
+/* =======================================================
+   VIZUALIZĀCIJAS KONTEINERS, CANVASES UN STATUSS
+   ======================================================= */
+.snapshot-container { width: 100%; background: #000; border-radius: 14px; padding: 18px; box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6); position: relative; }
+#snapshotCanvas { width: 100%; border-radius: 10px; border: 1px solid rgba(255, 255, 255, 0.03); display: block; margin-bottom: 12px; }
+#recordTimer { margin-top: 6px; color: #0ff; font-weight: 600; font-size: 16px; text-align: center; }
+
+#statusMsg {
+  font-weight: 600;
+  font-size: 16px;
+  color: #fff;
+  text-align: center;
+  margin-top: 8px;
+  padding: 8px;
+  background: rgba(0, 0, 0, 0.5);
+  border-radius: 12px;
+  max-width: 90%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+#progressBarContainer {
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto;
+  height: 18px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  overflow: hidden;
+  display: none;
+}
+
+#progressBar {
+  height: 100%;
+  width: 100%;
+  background: linear-gradient(90deg, #0ff, #4a90e2);
+  border-radius: 6px;
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 0.4s ease;
+}
+
+#fullscreenIcon { position: absolute; top: 10px; right: 10px; display: flex; align-items: center; cursor: pointer; color: #0ff; background: rgba(0, 0, 0, 0.3); border-radius: 6px; padding: 6px 10px; transition: background 0.2s, transform 0.2s; z-index: 10; }
+#fullscreenIcon:hover { background: rgba(0, 255, 255, 0.2); transform: scale(1.05); }
+#toggleInfoIcon { position: absolute; top: 10px; left: 10px; display: flex; align-items: center; cursor: pointer; color: #0ff; background: rgba(0, 0, 0, 0.3); border-radius: 6px; padding: 6px 10px; transition: background 0.2s, transform 0.2s; z-index: 10; }
+#toggleInfoIcon:hover { background: rgba(0, 255, 255, 0.2); transform: scale(1.05); }
+#accountDisplay { width: 100%; word-break: break-word; margin-top: 8px; font-size: 16px; text-align: center; font-family: monospace; }
+
+/* =======================================================
+   TOKENU SARAKSTS UN PAPILDUS INFO
+   ======================================================= */
+#tokenListContainer {
+  display: none;
+  position: absolute;
+  top: 80px;
+  left: 10px;
+  max-height: 150px;
+  width: 90%;
+  max-width: 576px;
+  background: rgba(0, 0, 0, 0.5);
+  border-radius: 9px;
+  overflow-y: auto;
+  padding: 10px;
+  font-size: 14px;
+  z-index: 15;
+}
+
+#tokenListContainer table { width: 100%; border-collapse: collapse; }
+#tokenListContainer th, #tokenListContainer td { padding: 6px 8px; text-align: left; font-size: 13px; }
+#tokenListContainer th { color: #0ff; font-weight: 600; }
+#tokenListContainer tr:nth-child(even) td { background: rgba(255, 255, 255, 0.05); }
+#tokenListContainer tr:nth-child(odd) td { background: rgba(255, 255, 255, 0.02); }
+#tokenListContainer::-webkit-scrollbar { width: 6px; }
+#tokenListContainer::-webkit-scrollbar-thumb { background: #0ff; border-radius: 3px; }
+
+.warning-banner {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: #f59e0b;
+  color: #000;
+  text-align: center;
+  padding: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  z-index: 200;
+  transform: translateY(-100%);
+  transition: transform 0.3s ease;
+}
+.warning-banner.show { transform: translateY(0); }
+
+.site-header { position: relative; width: 100%; min-height: 80px; }
+.logo { position: absolute; top: 0px; left: 10px; width: 280px; height: auto; }
+.header-text { text-align: center; padding-top: 5px; }
+
+.ipfs-preview {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: rgba(0, 0, 0, 0.8);
+  border: 1px solid #0ff;
+  border-radius: 8px;
+  padding: 10px;
+  font-size: 11px;
+  max-width: 300px;
+  z-index: 100;
+  display: none; 
+}
+.ipfs-preview a { color: #0ff; word-break: break-all; }
+
+/* =======================================================
+   ABOUT POGA UN MODAL (IZLECOŠAIS LOGS) - GRĀMATU REŽĪMS
+   ======================================================= */
 .about-button {
   position: absolute;
   top: 20px;
@@ -359,55 +391,55 @@ button.loading::after {
   top: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.65); /* Maigāka ēna apkārt */
+  background-color: rgba(0, 0, 0, 0.7); /* Tumšāks fons aizmugurē labākam fokusam */
   backdrop-filter: blur(6px);
   animation: fadeInModal 0.3s ease;
 }
 
 .modal-content {
-  background: #f4f5f7; /* ACĪM DRAUDZĪGS GAIŠS FONS */
-  color: #1e293b;     /* TUMŠS, LABI LASĀMS TEKSTS */
+  background: #fbf0db;       /* GRĀMATAS PAPĪRA FONS */
+  color: #2c2421;            /* MAIGS, TUMŠI BRŪNS TEKSTS */
   margin: 10vh auto;
   padding: 30px;
-  border: 2px solid #000000; /* Izteiksmīga melna apmale asajiem stūriem */
-  border-radius: 0; /* ASI STŪRI */
+  border: 2px solid #5b4636; /* Pieskaņota, tumšāka apmale */
+  border-radius: 0;          /* STRIKTAS ASAS MALAS STŪRIEM */
   width: 85%;
   max-width: 700px;
   max-height: 80vh;
   overflow-y: auto;
   position: relative;
   font-family: 'Inter', sans-serif;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.4);
 }
 
 .modal-content h2 {
   font-size: 24px;
   margin-top: 0;
   text-align: center;
-  color: #0f172a; /* Pavisam tumšs virsraksts */
+  color: #2c2421; 
   background: none;
   font-weight: 700;
-  border-bottom: 2px solid #e2e8f0;
+  border-bottom: 2px solid #dfd3ba; /* Smalka līnija grāmatas stilā */
   padding-bottom: 12px;
 }
 
 .modal-content h3 {
-  color: #0f172a;
+  color: #5b4636; /* Siltāks tonis apakšvirsrakstiem */
   margin-top: 24px;
   font-weight: 700;
 }
 
 .modal-content p, .modal-content li {
   line-height: 1.6;
-  color: #334155; /* Maigi tumši pelēks tekstam, lai nav pārāk ass */
+  color: #42342b; /* Patīkami lasāms un kontrastējošs teksts */
 }
 
 .modal-content strong {
-  color: #0f172a; /* Svarīgie akcenti tumšāki */
+  color: #1a1412; /* Svarīgie akcenti ir nedaudz tumšāki */
 }
 
 .close-modal {
-  color: #64748b;
+  color: #8c7667;
   position: absolute;
   top: 15px;
   right: 20px;
@@ -419,7 +451,7 @@ button.loading::after {
 }
 
 .close-modal:hover {
-  color: #0f172a;
+  color: #2c2421;
 }
 
 @keyframes fadeInModal {
@@ -427,7 +459,18 @@ button.loading::after {
   to { opacity: 1; }
 }
 
+/* =======================================================
+   RESPONSĪVAIS DIZAINS (MOBILĀS IERĪCES)
+   ======================================================= */
 @media (max-width: 768px) {
+  .logo { position: static; display: block; margin: 0 auto 20px auto; width: 140px; }
+  .header-text { padding-top: 0; }
+  .site-header { min-height: auto; }
+  .chain-selector { flex-wrap: wrap; justify-content: center; gap: 10px; }
+  #tokenListContainer { max-width: calc(100% - 40px); left: 20px; right: 20px; top: 100px; }
+  #progressBarContainer { width: 90%; }
+  #accountDisplay { font-size: 12px; word-break: break-all; }
+  
   .about-button {
     position: static;
     margin: 10px auto;
