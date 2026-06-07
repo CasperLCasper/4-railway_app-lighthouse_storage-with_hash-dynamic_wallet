@@ -44,11 +44,11 @@ export const VIZ_CHAINS = {
     blockExplorer: 'https://sepolia.etherscan.io',
     alchemyNetwork: 'eth-sepolia'
   },
-  mumbai: {
-    name: 'Polygon Amoy',
-    chainId: 80002,
-    chainIdHex: '0x13882',
-    rpc: [
+  mumbai: { // ✅ SAGLABĀTS: Atslēgvārds 'mumbai', lai nekas nesabruktu citos failos!
+    name: 'Polygon Amoy Testnet', // ✅ SALABOTS: Oficiālais nosaukums
+    chainId: 80002,               // ✅ SALABOTS: Pareizais Amoy ID (skaitlis)
+    chainIdHex: '0x1388a',        // ✅ SALABOTS: ĪSTAIS Amoy Hex ID!
+    rpc: [                        // ✅ SAGLABĀTI: Masīvi atbilstoši tavam kodam
       'https://rpc-amoy.polygon.technology',
       'https://polygon-amoy-bor-rpc.publicnode.com'
     ],
