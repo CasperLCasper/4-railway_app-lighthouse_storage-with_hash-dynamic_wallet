@@ -363,11 +363,12 @@ button.loading::after {
   position: absolute;
   top: 20px;
   right: 20px;
-  padding: 10px 22px;
-  background: rgba(30, 30, 40, 0.8);
+  padding: 10px 24px;
+  background: rgba(255, 255, 255, 0.08); /* Gluds fons bez liekām apmalēm */
   backdrop-filter: blur(10px);
-  color: #fff;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  -webkit-backdrop-filter: blur(10px);
+  color: #ffffff;
+  border: none;                           /* Pilnībā noņemts jocīgais rāmītis */
   border-radius: 40px;
   cursor: pointer;
   font-family: 'Inter', sans-serif;
@@ -378,8 +379,8 @@ button.loading::after {
 }
 
 .about-button:hover {
-  border-color: #ffffff;
-  box-shadow: 0 0 14px rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.15); /* Poga eleganti izgaismojas */
+  box-shadow: 0 4px 20px rgba(255, 255, 255, 0.1);
   transform: translateY(-2px);
 }
 
