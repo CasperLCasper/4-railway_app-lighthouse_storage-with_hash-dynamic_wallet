@@ -2,7 +2,7 @@
 // WEB3 FUNCTIONS
 // ============================================ //
 
-import { VIZ_CHAINS, MINT_CHAIN, getAllRpcUrls } from './chains.js';
+import { VIZ_CHAINS, MINT_CHAIN, getAllRpcUrls, getRpcUrl } from './chains.js';
 import { UI } from './state.js';
 import { showToast, setButtonLoading, showProgress, hideProgress } from './ui.js';
 import { login, getNFTPrice, getContractAddress } from './api.js';
@@ -90,7 +90,9 @@ async function updateBalanceDisplay(account) {
     balanceDisplay.textContent = '💰 Checking balance...';
     balanceDisplay.className = 'balance-display checking';
     
-    const baseProvider = new ethers.JsonRpcProvider('https://sepolia.base.org');
+    // ✅ UZLABOTS: Izmantojam dinamisko RPC no chains moduļa teksta virknes vietā
+    const baseMintRpc = getRpcUrl('baseSepolia') || 'https://sepolia.base.org';
+    const baseProvider = new ethers.JsonRpcProvider(baseMintRpc);
     const contractAddress = await getContractAddress();
     
     if (!contractAddress) {
