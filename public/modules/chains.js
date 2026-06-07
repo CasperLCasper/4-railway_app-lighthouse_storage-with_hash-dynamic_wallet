@@ -45,14 +45,14 @@ export const VIZ_CHAINS = {
     alchemyNetwork: 'eth-sepolia'
   },
   mumbai: { // ✅ SAGLABĀTS: Atslēgvārds 'mumbai', lai nekas nesabruktu citos failos!
-    name: 'Polygon Amoy Testnet', // ✅ SALABOTS: Oficiālais nosaukums
-    chainId: 80002,               // ✅ SALABOTS: Pareizais Amoy ID (skaitlis)
-    chainIdHex: '0x1388a',        // ✅ SALABOTS: ĪSTAIS Amoy Hex ID!
-    rpc: [                        // ✅ SAGLABĀTI: Masīvi atbilstoši tavam kodam
+    name: 'Polygon Amoy Testnet', // ✅ ATJAUNINĀTS: Oficiālais nosaukums
+    chainId: 80002,               // ✅ ATJAUNINĀTS: Pareizais Amoy ID (skaitlis)
+    chainIdHex: '0x1388a',        // ✅ ATJAUNINĀTS: ĪSTAIS Amoy Hex ID!
+    rpc: [
       'https://rpc-amoy.polygon.technology',
       'https://polygon-amoy-bor-rpc.publicnode.com'
     ],
-    nativeCurrency: 'MATIC',
+    nativeCurrency: 'POL',        // ✅ ATJAUNINĀTS: Oficiālais Amoy valūtas simbols
     blockExplorer: 'https://amoy.polygonscan.com',
     alchemyNetwork: 'polygon-amoy'
   },
