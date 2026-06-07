@@ -6,7 +6,7 @@ import { AppState, initUI, UI } from './modules/state.js';
 import { VIZ_CHAINS, MINT_CHAIN } from './modules/chains.js';
 import { LIGHTHOUSE_GATEWAY, CONTRACT_ABI, LOW_POWER_MODE } from './modules/config.js';
 import { showToast, setButtonLoading, updateTokenListUI, hideProgress, showProgress } from './modules/ui.js';
-import { login, getNFTPrice, getContractAddress } from './modules/api.js';
+import { login, getNFTPrice, getContractAddress, getMintProvider } from './modules/api.js';
 import { connectWallet, updateChainStatus, switchToMintChain, switchToVizChain } from './modules/web3.js';
 import { 
   uploadImageToIPFS, uploadVideoToIPFS, uploadMetadataToIPFS, 
@@ -116,38 +116,43 @@ const App = Object.assign({}, AppState, {
       return; 
     }
     
+    setButtonLoading(UI.generateNFTBtn, true);
     showToast('🔄 Switching to Base Sepolia network for minting...', 'info');
     
-    await switchToMintChain();
-    
-    this.provider = new ethers.BrowserProvider(window.ethereum);
-    this.signer = await this.provider.getSigner();
-    this.account = await this.signer.getAddress();
-    
-    const loginSuccess = await login(this.signer, this.account);
-    if (!loginSuccess) {
-      showToast('🔐 Authentication failed. Please reconnect your wallet.', 'error');
-      setButtonLoading(UI.generateNFTBtn, false);
-      return;
-    }
-    
-    const contractAddress = await getContractAddress();
-    let mintPriceEth = "?";
-    if (contractAddress) {
-      try {
-        const contract = new ethers.Contract(contractAddress, CONTRACT_ABI, this.provider);
-        const priceWei = await contract.mintPrice();
-        mintPriceEth = ethers.formatEther(priceWei);
-        UI.generateNFTBtn.setAttribute('data-price', `${mintPriceEth} ETH + gas`);
-      } catch(e) {
-        console.warn("Could not fetch price on mint chain:", e);
-      }
-    }
-    
-    setButtonLoading(UI.generateNFTBtn, true);
-    showToast('📸 Creating your NFT assets...', 'info');
-    
     try {
+      await switchToMintChain();
+      
+      // ✅ SALABOTS: Pievienojam mazu pauzi, lai maks paspēj pārslēgt iekšējo stāvokli
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      this.provider = new ethers.BrowserProvider(window.ethereum);
+      this.signer = await this.provider.getSigner();
+      this.account = await this.signer.getAddress();
+      
+      const loginSuccess = await login(this.signer, this.account);
+      if (!loginSuccess) {
+        showToast('🔐 Authentication failed. Please reconnect your wallet.', 'error');
+        setButtonLoading(UI.generateNFTBtn, false);
+        return;
+      }
+      
+      const contractAddress = await getContractAddress();
+      let mintPriceEth = "?";
+      if (contractAddress) {
+        try {
+          // ✅ UZLABOTS: Izmantojam stabilu Mint Provideri cenas nolasīšanai
+          const stableProvider = await getMintProvider();
+          const contract = new ethers.Contract(contractAddress, CONTRACT_ABI, stableProvider);
+          const priceWei = await contract.mintPrice();
+          mintPriceEth = ethers.formatEther(priceWei);
+          UI.generateNFTBtn.setAttribute('data-price', `${mintPriceEth} ETH + gas`);
+        } catch(e) {
+          console.warn("Could not fetch price on mint chain:", e);
+        }
+      }
+      
+      showToast('📸 Creating your NFT assets...', 'info');
+      
       // 1. Izveido attēlu
       const imageBlob = await new Promise((resolve, reject) => {
         UI.canvas.toBlob((blob) => {
@@ -280,10 +285,7 @@ const App = Object.assign({}, AppState, {
         mintData = await mintRes.json();
       } catch (apiError) {
         console.error("Mint API error:", apiError);
-        showToast(`❌ Mint preparation failed: ${apiError.message}`, 'error');
-        setButtonLoading(UI.generateNFTBtn, false);
-        hideProgress();
-        return;
+        throw new Error(`Mint preparation failed: ${apiError.message}`);
       }
       
       if (!mintData.success) throw new Error(mintData.error || 'Mint preparation failed');
