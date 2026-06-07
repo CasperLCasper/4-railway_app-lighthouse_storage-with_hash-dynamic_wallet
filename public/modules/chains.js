@@ -45,16 +45,16 @@ export const VIZ_CHAINS = {
     alchemyNetwork: 'eth-sepolia'
   },
   mumbai: {
-    name: 'Polygon Mumbai',
-    chainId: 80001,
-    chainIdHex: '0x13881',
+    name: 'Polygon Amoy',
+    chainId: 80002,
+    chainIdHex: '0x13882',
     rpc: [
-      'https://rpc-mumbai.maticvigil.com',
-      'https://polygon-mumbai-bor-rpc.publicnode.com'
+      'https://rpc-amoy.polygon.technology',
+      'https://polygon-amoy-bor-rpc.publicnode.com'
     ],
     nativeCurrency: 'MATIC',
-    blockExplorer: 'https://mumbai.polygonscan.com',
-    alchemyNetwork: 'polygon-mumbai'
+    blockExplorer: 'https://amoy.polygonscan.com',
+    alchemyNetwork: 'polygon-amoy'
   },
   bscTestnet: {
     name: 'BNB Chain Testnet',
