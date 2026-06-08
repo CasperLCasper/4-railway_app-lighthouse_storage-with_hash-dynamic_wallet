@@ -63,7 +63,6 @@ async function fetchWithTimeout(url, options = {}, timeoutMs = DEFAULT_TIMEOUT_M
       }
       
       return response;
-      
     } catch (error) {
       clearTimeout(timeoutId);
       lastError = error;
@@ -137,10 +136,6 @@ export async function apiFetch(url, options = {}) {
 // NONCE HANDLING (JWT nonce, bez papildu galvenēm)
 // ============================================ //
 
-/**
- * Iegūst nonce (tagad JWT) no servera pirms pieteikšanās.
- * Vairs neizmanto X-Session-ID – serveris atgriež pašpietiekamu JWT.
- */
 async function getNonce() {
   const res = await fetch('/api/auth/nonce');
   if (!res.ok) {
@@ -148,7 +143,7 @@ async function getNonce() {
     throw new Error(`Failed to get nonce: ${text}`);
   }
   const data = await safeJson(res);
-  return data.nonce; // tas ir JWT
+  return data.nonce;
 }
 
 // ============================================ //
@@ -159,16 +154,10 @@ export async function login(signer, account) {
   if (!signer) return false;
   
   try {
-    // 1. Iegūstam nonce JWT no servera
     const nonceToken = await getNonce();
-    
-    // 2. Veidojam ziņojumu, kas sākas ar šo JWT
     const message = `${nonceToken} - Login to NFT Wallet Visualizer`;
-    
-    // 3. Parakstām ziņojumu ar maku
     const signature = await signer.signMessage(message);
     
-    // 4. Nosūtām uz serveri (vairs nav X-Session-ID galvenes)
     const res = await fetchWithTimeout('/api/auth/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -231,7 +220,10 @@ export async function getNFTPrice() {
 export async function getTokens(account, chain) {
   if (!account) return [];
   try {
-    const url = `/api/getTokens?account=${encodeURIComponent(account)}&chain=${chain}`;
+    // ✅ DROŠĪBAS TULKS: Ja backendā joprojām tiek izmantots 'mumbai', pārtulkojam to šeit dApp pusē
+    const backendChain = chain === 'polygonAmoy' ? 'mumbai' : chain;
+    
+    const url = `/api/getTokens?account=${encodeURIComponent(account)}&chain=${backendChain}`;
     const res = await apiFetch(url);
     
     const data = await safeJson(res);
@@ -268,13 +260,16 @@ export async function getTokens(account, chain) {
 export async function getAllNFTs(account, chain) {
   if (!account) return [];
   try {
+    // ✅ DROŠĪBAS TULKS: Ja backendā joprojām tiek izmantots 'mumbai', pārtulkojam to šeit dApp pusē
+    const backendChain = chain === 'polygonAmoy' ? 'mumbai' : chain;
+    
     const allNFTs = [];
     let pageKey = null;
     const MAX_PAGES = 10;
     const seenPageKeys = new Set();
     
     for (let i = 0; i < MAX_PAGES; i++) {
-      let url = `/api/getAllNFTs?account=${encodeURIComponent(account)}&chain=${chain}`;
+      let url = `/api/getAllNFTs?account=${encodeURIComponent(account)}&chain=${backendChain}`;
       if (pageKey) {
         url += `&pageKey=${pageKey}`;
       }
