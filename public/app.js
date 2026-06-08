@@ -223,7 +223,6 @@ const App = Object.assign({}, AppState, {
       const gw = LIGHTHOUSE_GATEWAY;
       const imageUrl = serverData.image.cid ? `${gw}${serverData.image.cid}` : `local://${serverData.image.hash}`;
       
-      // Dinamiski nosakām žetona nosaukumu no izvēlētās vizualizācijas ķēdes
       const currentChainConfig = VIZ_CHAINS[this.currentVizChain];
       const isAmoy = this.currentVizChain === 'polygonAmoy' || currentChainConfig?.chainIdHex?.toLowerCase() === '0x13882';
       const nativeTokenSymbol = isAmoy ? 'POL' : (currentChainConfig?.nativeCurrency || 'ETH');
@@ -234,7 +233,7 @@ const App = Object.assign({}, AppState, {
         image: imageUrl,
         attributes: [
           { trait_type: "Balance Amount", value: this.ethBalance.toString() },
-          { trait_type: "Native Token", value: nativeTokenSymbol }, // ✅ LABOJUMS: Noņemts cieti kodētais ETH jēdziens
+          { trait_type: "Native Token", value: nativeTokenSymbol },
           { trait_type: "Token Count", value: this.tokens.length.toString() },
           { trait_type: "Transaction Count", value: this.txCount.toString() },
           { trait_type: "Visual Style", value: ADDON_STYLES[this.currentAddonStyle]?.name || this.currentAddonStyle },
@@ -369,7 +368,23 @@ const App = Object.assign({}, AppState, {
       this.handleSessionExpired();
     });
     
-    UI.connectBtn.addEventListener('click', () => connectWallet(this));
+    // ✅ LABOJUMS: Tiklīdz tiek uzklikšķināts uz "Connect Wallet", tūlītēji un sinhroni
+    // nodzēšam vecos datus, lai Canvas pāriet ielādes režīmā un nerāda iepriekšējā tīkla skaitļus.
+    UI.connectBtn.addEventListener('click', async () => {
+      this.tokens = [];
+      this.ethBalance = 0;
+      this.txCount = 0;
+      this.particles = [];
+      this.initialParticles = [];
+      this.nftCenters = [];
+      this.particleCache.clear();
+      
+      if (UI.tokenListContent) UI.tokenListContent.innerHTML = '';
+      
+      // Izsaucam pamata connect loģiku
+      await connectWallet(this);
+    });
+    
     UI.renderBtn.addEventListener('click', () => this.renderSnapshot(this.currentVizChain));
     UI.generateNFTBtn.addEventListener('click', () => this.generateNFT());
     UI.recordBtn.addEventListener('click', () => startRecording(this));
