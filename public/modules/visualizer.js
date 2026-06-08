@@ -48,6 +48,7 @@ export function cleanup(app) {
 export function hashStringToInt(str, mod = 1000) { 
   let h = 2166136261 >>> 0; 
   for (let i = 0; i < str.length; i++) {
+    // Izmantojam codePointAt, lai pareizi apstrādātu pilnus Unicode simbolus
     h ^= str.codePointAt(i);
     h = Math.imul(h, 16777619) >>> 0;
   } 
@@ -217,22 +218,38 @@ export function drawFrame(app, frame, showTokensFrame) {
     addon.drawExtraEffects(ctx, W, H, frame, app.particles, cx0, cy0);
   }
   
-  // ✅ KRITISKAIS LABOJUMS: Dinamiska natīvās valūtas nosaukuma noteikšana tieši uz Canvas
+  // ✅ LABOJUMS: Novēršam veco datu un jauno valūtu sajaukšanos uz ekrāna ielādes laikā
   if (showTokensFrame && app.showInfo) {
     const currentChainConfig = VIZ_CHAINS[app.currentVizChain];
     const isAmoy = app.currentVizChain === 'polygonAmoy' || currentChainConfig?.chainIdHex?.toLowerCase() === '0x13882';
     const nativeTokenSymbol = isAmoy ? 'POL' : (currentChainConfig?.nativeCurrency || 'ETH');
 
+    // Pārbaudām, vai renderēšanas poga šobrīd ir atspējota (notiek asinhrona ielāde)
+    const isLoadingData = UI.renderBtn && UI.renderBtn.disabled;
+
     ctx.fillStyle = '#0ff';
     ctx.font = '20px Inter';
-    ctx.fillText(`${nativeTokenSymbol}: ${app.ethBalance.toFixed(4)}`, 15, 70); // 💥 Salabots statiskais ETH uzraksts
+    
+    if (isLoadingData) {
+      // Kamēr lādējas, rādām neitrālu statusu ar pareizo izvēlētā tīkla simbolu
+      ctx.fillText(`${nativeTokenSymbol}: Loading data...`, 15, 70);
+    } else {
+      // Kad dati pilnībā ielādēti, smuki izvadām jauno bilanci
+      ctx.fillText(`${nativeTokenSymbol}: ${app.ethBalance.toFixed(4)}`, 15, 70);
+    }
+
     ctx.font = '14px Inter';
     ctx.fillStyle = addon.color;
     ctx.fillText(`${addon.displayName} ACTIVE`, 15, 100);
     ctx.font = '11px Inter';
     ctx.fillStyle = '#888';
-    const tokenCount = app.tokens.filter(t => !t.isNFT).length;
-    ctx.fillText(`TX: ${app.txCount} | Assets: ${app.tokens.length} (${tokenCount} tokens, ${app.nftCenters.length} NFTs)`, 15, 125);
+    
+    if (isLoadingData) {
+      ctx.fillText(`Updating blockchain state, please wait...`, 15, 125);
+    } else {
+      const tokenCount = app.tokens.filter(t => !t.isNFT).length;
+      ctx.fillText(`TX: ${app.txCount} | Assets: ${app.tokens.length} (${tokenCount} tokens, ${app.nftCenters.length} NFTs)`, 15, 125);
+    }
   }
 }
 
@@ -286,16 +303,19 @@ export function cloneParticles(app) {
 export async function renderSnapshot(app, chain) {
   if (!app.account) return;
 
+  // ✅ LABOJUMS: Sinhroni pirms jebkādiem "await" nodzēšam veco stāvokli, 
+  // lai drawFrame funkcija uzreiz pārslēgtos ielādes režīmā.
+  app.tokens = [];
+  app.ethBalance = 0;
+  app.txCount = 0;
+  app.nftCenters = [];
+
   setButtonLoading(UI.renderBtn, true);
   stopAnimation(app);
   cleanup(app);
   showProgress();
   app.particleCache.clear();
   showToast(`Loading ${chain} wallet data...`, 'info');
-
-  app.tokens = [];
-  app.ethBalance = 0;
-  app.txCount = 0;
 
   const steps = [
     { name: 'Fetching balance...', func: async () => { app.ethBalance = Number(ethers.formatEther(await app.provider.getBalance(app.account))) || 0; }},
