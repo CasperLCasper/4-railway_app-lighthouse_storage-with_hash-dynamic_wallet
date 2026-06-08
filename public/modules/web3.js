@@ -15,7 +15,8 @@ export async function updateChainStatus() {
     const selectedChainKey = UI.chainSelect.value;
     const selectedChain = VIZ_CHAINS[selectedChainKey];
     
-    if (selectedChain && chainIdHex === selectedChain.chainIdHex) {
+    // ✅ LABOTS: Salīdzinām abus chainId, ignorējot lielo/mazo burtu atšķirības, lai novāktu lieko brīdinājumu
+    if (selectedChain && chainIdHex && chainIdHex.toLowerCase() === selectedChain.chainIdHex.toLowerCase()) {
       UI.chainStatus.className = 'chain-status connected';
       UI.chainStatus.title = '✓ Connected to correct network';
     } else {
@@ -60,7 +61,7 @@ export async function switchToVizChain(chainIdHex) {
     });
     await updateChainStatus();
   } catch (error) {
-    // ✅ UZLABOTS: Noķeram gan MetaMask kodu 4902, gan Enkrypt specifisko "not supported" ziņojumu
+    // ✅ NOĶERAM GAN METAMASK, GAN ENKRYPT SPECIFISKOS ZIŅOJUMUS
     const isNetworkMissing = 
       error.code === 4902 || 
       (error.message && error.message.includes('not supported')) ||
