@@ -60,7 +60,13 @@ export async function switchToVizChain(chainIdHex) {
     });
     await updateChainStatus();
   } catch (error) {
-    if (error.code === 4902) {
+    // ✅ UZLABOTS: Noķeram gan MetaMask kodu 4902, gan Enkrypt specifisko "not supported" ziņojumu
+    const isNetworkMissing = 
+      error.code === 4902 || 
+      (error.message && error.message.includes('not supported')) ||
+      (error.message && error.message.includes('wallet_switchEthereumChain'));
+
+    if (isNetworkMissing) {
       const chainConfig = Object.values(VIZ_CHAINS).find(c => c.chainIdHex === chainIdHex);
       if (chainConfig) {
         await window.ethereum.request({
