@@ -16,7 +16,7 @@
   <div class="container">
     <header class="site-header">
       <svg xmlns="http://www.w3.org/2000/svg" width="160" height="40" viewBox="0 0 158.74999 37.041668" class="logo"><text xml:space="preserve" font-size="14.1111" font-family="'DejaVu Sans Mono', monospace" fill="#ffffff" stroke="none" stroke-width="0.264583" x="8.8499603" y="31.493832"><tspan x="8.8499603" y="31.493832" fill="#ffffff">V I R S B U R T S</tspan></text><rect fill="#ffffff" stroke-width="0.264583" width="3.1013243" height="15.020124" x="5.9450045" y="3.8351295" /></svg>
-      <div class="header-text"><h1>Dynamic Wallet Visualizer</h1><p class="subtitle">Watch your Ethereum assets come alive</p></div>
+      <div class="header-text"><h1>Dynamic Wallet Visualizer</h1><p class="subtitle">Watch your multichain crypto assets come alive</p></div>
     </header>
     <div class="theme-selector">
       <button class="theme-btn theme-classic active" data-theme="classic">⭐ CLASSIC</button>
@@ -32,7 +32,8 @@
       <select id="chainSelect" class="chain-dropdown">
         <optgroup label="🪙 Testnet">
           <option value="sepolia" data-icon="🔷">🔷 Ethereum Sepolia</option>
-          <option value="polygonAmoy" data-icon="🟣">🟣 Polygon Amoy</option> <option value="bscTestnet" data-icon="🟡">🟡 BNB Chain Testnet</option>
+          <option value="polygonAmoy" data-icon="🟣">🟣 Polygon Amoy</option> 
+          <option value="bscTestnet" data-icon="🟡">🟡 BNB Chain Testnet</option>
           <option value="arbitrumSepolia" data-icon="🔵">🔵 Arbitrum Sepolia</option>
           <option value="optimismSepolia" data-icon="🔴">🔴 Optimism Sepolia</option>
           <option value="baseSepolia" data-icon="🔷">🔷 Base Sepolia</option>
@@ -54,6 +55,7 @@
       <button id="connectBtn">Connect Wallet</button><button id="renderBtn" disabled>Render Snapshot</button><button id="recordBtn" disabled>Record 15s HD Video</button><button id="generateNFTBtn" class="generate-nft-btn" disabled data-price="">Generate NFT on Base Sepolia</button>
     </div>
     <div id="accountDisplay">Connected account: —</div>
+    <div id="balanceDisplay" class="balance-display"></div>
     <div id="progressBarContainer"><div id="progressBar"></div></div>
     <div id="statusMsg" class="status"></div>
     <div id="recordTimer">Recording: 0 / 15 s</div>
@@ -71,7 +73,7 @@
       <span class="close-modal">&times;</span>
       
       <h2>About Platform</h2>
-      <p><strong>Wallet Visualizer</strong> pārvērš tavu Ethereum maku unikālā vizuālā mākslā un ļauj to saglabāt kā NFT ar pārbaudāmu autentiskumu.</p>
+      <p><strong>Wallet Visualizer</strong> pārvērš tavu izvēlētās blokķēdes maku unikālā vizuālā mākslā un ļauj to saglabāt kā NFT ar pārbaudāmu autentiskumu.</p>
       <p>Pieslēdz savu maku, izvēlies tēmu, un platforma ģenerēs tavu personīgo maka vizualizāciju — attēlu un 15 sekunžu video.</p>
       
       <hr style="border: 0; border-top: 1px solid rgba(255, 255, 255, 0.2); margin: 20px 0;">
@@ -90,7 +92,7 @@
       <ol style="padding-left: 20px; margin-bottom: 20px;">
         <li style="margin-bottom: 6px;"><strong>Pieslēdz maku</strong> — izmanto jebkuru Web3 maku (MetaMask, Enkrypt u.c.)</li>
         <li style="margin-bottom: 6px;"><strong>Izvēlies blokķēdi</strong> — atbalstītas vairākas ķēdes datu nolasīšanai</li>
-        <li style="margin-bottom: 6px;"><strong>Nopsied "Generate NFT"</strong> — platforma izveidos attēlu, video un metadatus</li>
+        <li style="margin-bottom: 6px;"><strong>Nospied "Generate NFT"</strong> — platforma izveidos attēlu, video un metadatus</li>
         <li style="margin-bottom: 6px;"><strong>Saņem failus</strong> — visi faili tiek saglabāti tavā datorā kā ZIP arhīvs</li>
         <li style="margin-bottom: 6px;"><strong>Faili nonāk Lighthouse.storage</strong> — faili tiek nodoti decentralizētā glabāšanā (IPFS + Filecoin)</li>
         <li style="margin-bottom: 6px;"><strong>Mintēšana Base tīklā</strong> — mākslas darbs tiek oficiāli mintēts kā NFT un tā unikālais SHA256 hash tiek ierakstīts Base viedlīgumā</li>
@@ -110,7 +112,7 @@
       <h3>Kāpēc Base tīkls un hash ir svarīgi?</h3>
       <p>Katram NFT tiek aprēķināts SHA256 hash — unikāls digitāls pirksta nospiedums, un viss process notiek Base vidē:</p>
       <ul style="list-style: square; padding-left: 20px; margin-bottom: 20px;">
-        <li style="margin-bottom: 6px;"><strong>Zemas izmaksas un ātrums:</strong> Pateicoties Base (Ethereum L2) tīklam, NFT mintēšanais ir zibenīga un prasa minimālu gāzes komisiju</li>
+        <li style="margin-bottom: 6px;"><strong>Zemas izmaksas un ātrums:</strong> Pateicoties Base (Ethereum L2) tīklam, NFT mintēšana ir zibenīga un prasa minimālu gāzes komisiju</li>
         <li style="margin-bottom: 6px;">Hash tiek neatgriezeniski ierakstīts blokķēdes viedlīgumā</li>
         <li style="margin-bottom: 6px;">Jebkurš var pārbaudīt, vai fails precīzi atbilst oriģinālam</li>
         <li style="margin-bottom: 6px;">Pat ja Lighthouse.storage pārstātu pastāvēt, hash paliek kā negrozāms īpašumtiesību pierādījums</li>
@@ -120,7 +122,7 @@
       <ul style="list-style: none; padding-left: 0;">
         <li style="margin-bottom: 6px;">💻 <strong>Saglabāti tavā datorā</strong> — uzreiz pēc izveides</li>
         <li style="margin-bottom: 6px;">☁️ <strong>Augšupielādēti Lighthouse.storage</strong> — decentralizēta IPFS + Filecoin glabāšana</li>
-        <li style="margin-bottom: 6px;">🛡️ <strong>Aizsargāti ar hash Base tīklā</strong> — jebkurš foils ir matemātiski pārbaudāms drošajā Base blokķēdē</li>
+        <li style="margin-bottom: 6px;">🛡️ <strong>Aizsargāti ar hash Base tīklā</strong> — jebkurš fails ir matemātiski pārbaudāms drošajā Base blokķēdē</li>
       </ul>
     </div>
   </div>
