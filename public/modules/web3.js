@@ -11,14 +11,18 @@ export async function updateChainStatus() {
   if (!window.ethereum || !UI.chainStatus) return;
   
   try {
+    // 1. Pajautājam makam pašreizējo hex ID (piemēram, 0x1388a)
     const chainIdHex = await window.ethereum.request({ method: 'eth_chainId' });
+    
+    // 2. Paņemam to tīklu, kuru lietotājs ir izvēlējies lapas dropdown izvēlnē
     const selectedChainKey = UI.chainSelect.value;
     const selectedChain = VIZ_CHAINS[selectedChainKey];
     
-    // ✅ LABOTS: Salīdzinām abus chainId, ignorējot lielo/mazo burtu atšķirības, lai novāktu lieko brīdinājumu
+    // ✅ GALA LABOJUMS: Mums ir vienalga, vai Enkrypt sevi sauc par "EVM" vai kā citādi.
+    // Kamēr vien maka atgrieztais ID sakrīt ar konfigurācijas ID, statuss būs zaļš un tīrs!
     if (selectedChain && chainIdHex && chainIdHex.toLowerCase() === selectedChain.chainIdHex.toLowerCase()) {
       UI.chainStatus.className = 'chain-status connected';
-      UI.chainStatus.title = '✓ Connected to correct network';
+      UI.chainStatus.title = `✓ Connected to ${selectedChain.name}`;
     } else {
       UI.chainStatus.className = 'chain-status disconnected';
       UI.chainStatus.title = '⚠️ Please switch network in your wallet';
@@ -61,14 +65,16 @@ export async function switchToVizChain(chainIdHex) {
     });
     await updateChainStatus();
   } catch (error) {
-    // ✅ NOĶERAM GAN METAMASK, GAN ENKRYPT SPECIFISKOS ZIŅOJUMUS
+    // ✅ NOĶERAM GAN METAMASK KODU 4902, GAN ENKRYPT "NOT SUPPORTED" BLOKU
     const isNetworkMissing = 
       error.code === 4902 || 
       (error.message && error.message.includes('not supported')) ||
       (error.message && error.message.includes('wallet_switchEthereumChain'));
 
     if (isNetworkMissing) {
-      const chainConfig = Object.values(VIZ_CHAINS).find(c => c.chainIdHex === chainIdHex);
+      const chainConfig = Object.values(VIZ_CHAINS).find(
+        c => c.chainIdHex && chainIdHex && c.chainIdHex.toLowerCase() === chainIdHex.toLowerCase()
+      );
       if (chainConfig) {
         await window.ethereum.request({
           method: 'wallet_addEthereumChain',
@@ -97,7 +103,6 @@ async function updateBalanceDisplay(account) {
     balanceDisplay.textContent = '💰 Checking balance...';
     balanceDisplay.className = 'balance-display checking';
     
-    // ✅ UZLABOTS: Izmantojam dinamisko RPC no chains moduļa teksta virknes vietā
     const baseMintRpc = getRpcUrl('baseSepolia') || 'https://sepolia.base.org';
     const baseProvider = new ethers.JsonRpcProvider(baseMintRpc);
     const contractAddress = await getContractAddress();
@@ -110,7 +115,6 @@ async function updateBalanceDisplay(account) {
     const mintPriceWei = await contract.mintPrice();
     const balanceWei = await baseProvider.getBalance(account);
     
-    // ✅ Izlabots: Number.parseFloat
     const balanceEth = Number.parseFloat(ethers.formatEther(balanceWei)).toFixed(5);
     const mintPriceEth = Number.parseFloat(ethers.formatEther(mintPriceWei)).toFixed(5);
     
@@ -157,10 +161,8 @@ export async function connectWallet(app) {
     app.signer = signer;
     app.account = account;
     
-    // 🔥 PILNA ADRESE (nesaīsināta)
     UI.accountDisplay.textContent = `Connected account: ${account}`;
     
-    // Wait for MetaMask to fully connect before signing
     await new Promise(resolve => setTimeout(resolve, 500));
     
     const loginSuccess = await login(signer, account);
@@ -198,7 +200,6 @@ export async function connectWallet(app) {
     
     showToast(userMessage, 'error');
     
-    // Notīrām app stāvokli, ja lietotājs atteicās
     if (err.message && (err.message.includes('User rejected') || err.message.includes('Login rejected'))) {
       app.provider = null;
       app.signer = null;
