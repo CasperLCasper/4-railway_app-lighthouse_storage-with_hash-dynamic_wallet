@@ -6,6 +6,8 @@ import { UI } from './state.js';
 import { showToast, showProgress, setProgress, hideProgress, setButtonLoading, updateTokenListUI } from './ui.js';
 import { MAX_PARTICLES, CONNECTION_DISTANCE, VIZ_LOW_POWER_MODE } from './config.js';
 import { getTokens, getAllNFTs } from './api.js';
+// ✅ LABOJUMS: Importējam tīklu konfigurāciju, lai dinamiski noteiktu valūtas simbolu
+import { VIZ_CHAINS } from './chains.js';
 
 export function getCanvasDimensions() {
   const isMobile = VIZ_LOW_POWER_MODE;
@@ -46,7 +48,6 @@ export function cleanup(app) {
 export function hashStringToInt(str, mod = 1000) { 
   let h = 2166136261 >>> 0; 
   for (let i = 0; i < str.length; i++) {
-    // Izmantojam codePointAt, lai pareizi apstrādātu pilnus Unicode simbolus
     h ^= str.codePointAt(i);
     h = Math.imul(h, 16777619) >>> 0;
   } 
@@ -216,10 +217,15 @@ export function drawFrame(app, frame, showTokensFrame) {
     addon.drawExtraEffects(ctx, W, H, frame, app.particles, cx0, cy0);
   }
   
+  // ✅ KRITISKAIS LABOJUMS: Dinamiska natīvās valūtas nosaukuma noteikšana tieši uz Canvas
   if (showTokensFrame && app.showInfo) {
+    const currentChainConfig = VIZ_CHAINS[app.currentVizChain];
+    const isAmoy = app.currentVizChain === 'polygonAmoy' || currentChainConfig?.chainIdHex?.toLowerCase() === '0x13882';
+    const nativeTokenSymbol = isAmoy ? 'POL' : (currentChainConfig?.nativeCurrency || 'ETH');
+
     ctx.fillStyle = '#0ff';
     ctx.font = '20px Inter';
-    ctx.fillText(`ETH: ${app.ethBalance.toFixed(4)}`, 15, 70);
+    ctx.fillText(`${nativeTokenSymbol}: ${app.ethBalance.toFixed(4)}`, 15, 70); // 💥 Salabots statiskais ETH uzraksts
     ctx.font = '14px Inter';
     ctx.fillStyle = addon.color;
     ctx.fillText(`${addon.displayName} ACTIVE`, 15, 100);
@@ -292,7 +298,7 @@ export async function renderSnapshot(app, chain) {
   app.txCount = 0;
 
   const steps = [
-    { name: 'ETH balance...', func: async () => { app.ethBalance = Number(ethers.formatEther(await app.provider.getBalance(app.account))) || 0; }},
+    { name: 'Fetching balance...', func: async () => { app.ethBalance = Number(ethers.formatEther(await app.provider.getBalance(app.account))) || 0; }},
     { name: 'Transaction count...', func: async () => { app.txCount = Number(await app.provider.getTransactionCount(app.account)) || 0; }},
     { name: 'ERC-20 tokens...', func: async () => { app.tokens = await getTokens(app.account, chain); }},
     { name: 'NFTs...', func: async () => { 
