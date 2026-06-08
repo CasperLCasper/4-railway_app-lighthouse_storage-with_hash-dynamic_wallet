@@ -44,15 +44,15 @@ export const VIZ_CHAINS = {
     blockExplorer: 'https://sepolia.etherscan.io',
     alchemyNetwork: 'eth-sepolia'
   },
-  mumbai: { // ✅ SAGLABĀTS: Atslēgvārds 'mumbai', lai nekas nesabruktu citos failos!
-    name: 'Polygon Amoy Testnet', // ✅ ATJAUNINĀTS: Oficiālais nosaukums
-    chainId: 80002,               // ✅ ATJAUNINĀTS: Pareizais Amoy ID (skaitlis)
-    chainIdHex: '0x1388a',        // ✅ ATJAUNINĀTS: ĪSTAIS Amoy Hex ID!
+  polygonAmoy: { // 🔥 PILNĪBĀ ATJAUNINĀTS: Izravēts vecais 'mumbai'
+    name: 'Polygon Amoy Testnet',
+    chainId: 80002,
+    chainIdHex: '0x1388a',
     rpc: [
       'https://rpc-amoy.polygon.technology',
       'https://polygon-amoy-bor-rpc.publicnode.com'
     ],
-    nativeCurrency: 'POL',        // ✅ ATJAUNINĀTS: Oficiālais Amoy valūtas simbols
+    nativeCurrency: 'POL',
     blockExplorer: 'https://amoy.polygonscan.com',
     alchemyNetwork: 'polygon-amoy'
   },
@@ -131,7 +131,6 @@ export function getAllRpcUrls(chainKey) {
 export function getChainByHexId(hexId) {
   for (const [key, chain] of Object.entries(VIZ_CHAINS)) {
     if (chain.chainIdHex === hexId) {
-      // 🔥 Return a COPY with a NEW rpc array (prevents mutation)
       return {
         key,
         ...chain,
@@ -146,7 +145,6 @@ export function getChainByHexId(hexId) {
 export function getChainById(chainId) {
   for (const [key, chain] of Object.entries(VIZ_CHAINS)) {
     if (chain.chainId === chainId) {
-      // 🔥 Return a COPY with a NEW rpc array (prevents mutation)
       return {
         key,
         ...chain,
