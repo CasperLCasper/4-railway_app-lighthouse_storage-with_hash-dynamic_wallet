@@ -69,7 +69,7 @@ const App = Object.assign({}, AppState, {
     
     updateChainStatus();
     
-    showToast('Network changed. Click "Connect Wallet" to reload your assets.', 'info');
+    // ✅ LABOJUMS: Vecais, liekais un mulsinošais "Network changed" ziņojums no šejienes ir pilnībā IZGRIEZTS.
     
     console.log("✅ App data cleared. Auth token preserved.");
   },
@@ -368,8 +368,6 @@ const App = Object.assign({}, AppState, {
       this.handleSessionExpired();
     });
     
-    // ✅ LABOJUMS: Tiklīdz tiek uzklikšķināts uz "Connect Wallet", tūlītēji un sinhroni
-    // nodzēšam vecos datus, lai Canvas pāriet ielādes režīmā un nerāda iepriekšējā tīkla skaitļus.
     UI.connectBtn.addEventListener('click', async () => {
       this.tokens = [];
       this.ethBalance = 0;
@@ -381,7 +379,6 @@ const App = Object.assign({}, AppState, {
       
       if (UI.tokenListContent) UI.tokenListContent.innerHTML = '';
       
-      // Izsaucam pamata connect loģiku
       await connectWallet(this);
     });
     
@@ -389,9 +386,10 @@ const App = Object.assign({}, AppState, {
     UI.generateNFTBtn.addEventListener('click', () => this.generateNFT());
     UI.recordBtn.addEventListener('click', () => startRecording(this));
     
+    // ✅ LABOJUMS: Papildinām dropdown maiņas notikumu ar skaidru angļu valodas paziņojumu
     UI.chainSelect.addEventListener('change', async () => {
       if (this.account) {
-        showToast(`Please reconnect wallet to switch to ${UI.chainSelect.value}`, 'info');
+        showToast(`You changed the network! Please reconnect wallet to switch to ${UI.chainSelect.value}`, 'info');
       }
     });
     
@@ -443,6 +441,8 @@ const App = Object.assign({}, AppState, {
     
     window.addEventListener('resize', () => resizeCanvas(this));
     
+    // ✅ LABOJUMS: Kad reāli makā (MetaMaskā) mainās tīkls, mēs tikai klusi iztīrām datus,
+    // lai tie nemaisās, un neizvadam nekādus liekus toastus. Lietotājs pats apzinās, ko tikko izdarīja makā.
     if (window.ethereum) {
       window.ethereum.on('chainChanged', () => {
         this.resetApp();
