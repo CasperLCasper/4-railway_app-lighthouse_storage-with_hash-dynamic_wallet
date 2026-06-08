@@ -71,9 +71,6 @@ export async function switchToVizChain(chainIdHex) {
       );
       
       if (chainConfig) {
-        // ✅ STRATĒĢISKS LABOJUMS ENKRYPT MAKAM:
-        // Ja tīkls ir Polygon Amoy, mēs cieti nodefinējam oficiālos parametrus,
-        // ko pieprasa maka drošības sistēma, lai noņemtu brīdinājumu.
         const isAmoy = chainConfig.chainIdHex.toLowerCase() === '0x13882';
         
         const currencySymbol = isAmoy ? 'POL' : (chainConfig.nativeCurrency || 'ETH');
@@ -110,6 +107,15 @@ async function updateBalanceDisplay(account) {
     balanceDisplay.textContent = '💰 Checking balance...';
     balanceDisplay.className = 'balance-display checking';
     
+    // 1. Noskaidrojam, kura vizualizācijas ķēde šobrīd ir izvēlēta dropdownā
+    const selectedChainKey = UI.chainSelect ? UI.chainSelect.value : null;
+    const selectedChain = VIZ_CHAINS[selectedChainKey];
+    
+    // Ja ķēde ir Amoy, tās simbols būs POL, citreiz ETH vai tas, kas norādīts konfigurācijā
+    const isAmoy = selectedChain?.chainIdHex?.toLowerCase() === '0x13882';
+    const vizTokenSymbol = isAmoy ? 'POL' : (selectedChain?.nativeCurrency || 'ETH');
+    
+    // 2. Šeit paliek viedlīguma dati no Base Sepolia (kur maksā par mintošanu)
     const baseMintRpc = getRpcUrl('baseSepolia') || 'https://sepolia.base.org';
     const baseProvider = new ethers.JsonRpcProvider(baseMintRpc);
     const contractAddress = await getContractAddress();
@@ -125,11 +131,14 @@ async function updateBalanceDisplay(account) {
     const balanceEth = Number.parseFloat(ethers.formatEther(balanceWei)).toFixed(5);
     const mintPriceEth = Number.parseFloat(ethers.formatEther(mintPriceWei)).toFixed(5);
     
+    // 3. ✅ STRATĒĢISKAIS LABOJUMS:
+    // Tā kā tavs līgums fiziski atrodas uz Base Sepolia, lietotājam maksa un bilance IR Base tīkla ETH.
+    // Lai lietotājam nebūtu apjukuma, mēs tekstā skaidri norādām "Base (ETH)", bet, ja vēlies parādīt arī izvēlētās ķēdes marķieri, mēs to izdarām šādi:
     if (balanceWei >= mintPriceWei) {
-      balanceDisplay.textContent = `✅ Base: ${balanceEth} ETH (enough to mint)`;
+      balanceDisplay.textContent = `✅ Base: ${balanceEth} ETH (enough to mint) | Network: ${vizTokenSymbol}`;
       balanceDisplay.className = 'balance-display sufficient';
     } else {
-      balanceDisplay.textContent = `⚠️ Base: ${balanceEth} ETH (need ${mintPriceEth} ETH to mint)`;
+      balanceDisplay.textContent = `⚠️ Base: ${balanceEth} ETH (need ${mintPriceEth} ETH to mint) | Network: ${vizTokenSymbol}`;
       balanceDisplay.className = 'balance-display insufficient';
     }
   } catch (error) {
