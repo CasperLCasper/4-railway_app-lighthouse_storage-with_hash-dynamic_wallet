@@ -8,5 +8,5 @@ export const MAINTENANCE_CONFIG = {
   
   // Teksti, kas parādīsies uz Canvas ekrāna
   title: '🛠️ SYSTEM UNDER MAINTENANCE 🛠️',
-  subtitle: 'We are optimizing the smart contracts. Please check back later.'
+  subtitle: 'Please check back later.'
 };
