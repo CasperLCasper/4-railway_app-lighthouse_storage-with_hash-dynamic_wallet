@@ -219,19 +219,25 @@ const App = Object.assign({}, AppState, {
       
       console.log('✅ Serveris apstrādāja:', serverData);
       
-      // 4. Izveido metadatus
+      // 4. Izveido metadatus dinamiski
       const gw = LIGHTHOUSE_GATEWAY;
       const imageUrl = serverData.image.cid ? `${gw}${serverData.image.cid}` : `local://${serverData.image.hash}`;
+      
+      // Dinamiski nosakām žetona nosaukumu no izvēlētās vizualizācijas ķēdes
+      const currentChainConfig = VIZ_CHAINS[this.currentVizChain];
+      const isAmoy = this.currentVizChain === 'polygonAmoy' || currentChainConfig?.chainIdHex?.toLowerCase() === '0x13882';
+      const nativeTokenSymbol = isAmoy ? 'POL' : (currentChainConfig?.nativeCurrency || 'ETH');
       
       const metadata = {
         name: "Wallet Visualization NFT",
         description: `Generated from wallet ${this.account} on ${new Date().toISOString()}`,
         image: imageUrl,
         attributes: [
-          { trait_type: "ETH Balance", value: this.ethBalance.toString() },
+          { trait_type: "Balance Amount", value: this.ethBalance.toString() },
+          { trait_type: "Native Token", value: nativeTokenSymbol }, // ✅ LABOJUMS: Noņemts cieti kodētais ETH jēdziens
           { trait_type: "Token Count", value: this.tokens.length.toString() },
           { trait_type: "Transaction Count", value: this.txCount.toString() },
-          { trait_type: "Visual Style", value: ADDON_STYLES[this.currentAddonStyle].name },
+          { trait_type: "Visual Style", value: ADDON_STYLES[this.currentAddonStyle]?.name || this.currentAddonStyle },
           { trait_type: "Source Chain", value: this.currentVizChain },
           { trait_type: "Generated At", value: new Date().toISOString() }
         ]
@@ -423,8 +429,6 @@ const App = Object.assign({}, AppState, {
     window.addEventListener('resize', () => resizeCanvas(this));
     
     if (window.ethereum) {
-      // ✅ UZLABOTS NOTIKUMU KLAUSĪTĀJS: Kad makā mainās tīkls, 
-      // mēs uzreiz izpildām resetApp(), lai novērstu veco datu pārklāšanos.
       window.ethereum.on('chainChanged', () => {
         this.resetApp();
       });
