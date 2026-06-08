@@ -11,15 +11,11 @@ export async function updateChainStatus() {
   if (!window.ethereum || !UI.chainStatus) return;
   
   try {
-    // 1. Pajautājam makam pašreizējo hex ID (piemēram, 0x1388a)
     const chainIdHex = await window.ethereum.request({ method: 'eth_chainId' });
-    
-    // 2. Paņemam to tīklu, kuru lietotājs ir izvēlējies lapas dropdown izvēlnē
-    const selectedChainKey = UI.chainSelect.value;
+    const selectedChainKey = UI.chainSelect ? UI.chainSelect.value : null;
     const selectedChain = VIZ_CHAINS[selectedChainKey];
     
-    // ✅ GALA LABOJUMS: Mums ir vienalga, vai Enkrypt sevi sauc par "EVM" vai kā citādi.
-    // Kamēr vien maka atgrieztais ID sakrīt ar konfigurācijas ID, statuss būs zaļš un tīrs!
+    // Tīra un loģiska pārbaude: ja izvēlētais tīkls eksistē un tā ID sakrīt ar maka ID
     if (selectedChain && chainIdHex && chainIdHex.toLowerCase() === selectedChain.chainIdHex.toLowerCase()) {
       UI.chainStatus.className = 'chain-status connected';
       UI.chainStatus.title = `✓ Connected to ${selectedChain.name}`;
@@ -65,7 +61,6 @@ export async function switchToVizChain(chainIdHex) {
     });
     await updateChainStatus();
   } catch (error) {
-    // ✅ NOĶERAM GAN METAMASK KODU 4902, GAN ENKRYPT "NOT SUPPORTED" BLOKU
     const isNetworkMissing = 
       error.code === 4902 || 
       (error.message && error.message.includes('not supported')) ||
@@ -94,7 +89,6 @@ export async function switchToVizChain(chainIdHex) {
   }
 }
 
-// 🔥 Pārbauda bilanci un atjaunina displeju
 async function updateBalanceDisplay(account) {
   const balanceDisplay = document.getElementById('balanceDisplay');
   if (!balanceDisplay) return;
