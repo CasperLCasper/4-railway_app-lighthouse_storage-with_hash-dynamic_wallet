@@ -4,9 +4,9 @@
 
 import { AppState, initUI, UI } from './modules/state.js';
 import { VIZ_CHAINS, MINT_CHAIN } from './modules/chains.js';
-import { LIGHTHOUSE_GATEWAY, CONTRACT_ABI, LOW_POWER_MODE, getMintProvider } from './modules/config.js'; // ✅ SALABOTS: getMintProvider importēts no config.js
+import { LIGHTHOUSE_GATEWAY, CONTRACT_ABI, LOW_POWER_MODE, getMintProvider } from './modules/config.js'; 
 import { showToast, setButtonLoading, updateTokenListUI, hideProgress, showProgress } from './modules/ui.js';
-import { login, getNFTPrice, getContractAddress } from './modules/api.js'; // ✅ SALABOTS: Noņemts neeksistējošais imports no api.js
+import { login, getNFTPrice, getContractAddress } from './modules/api.js'; 
 import { connectWallet, updateChainStatus, switchToMintChain, switchToVizChain } from './modules/web3.js';
 import { 
   uploadImageToIPFS, uploadVideoToIPFS, uploadMetadataToIPFS, 
@@ -423,8 +423,10 @@ const App = Object.assign({}, AppState, {
     window.addEventListener('resize', () => resizeCanvas(this));
     
     if (window.ethereum) {
+      // ✅ UZLABOTS NOTIKUMU KLAUSĪTĀJS: Kad makā mainās tīkls, 
+      // mēs uzreiz izpildām resetApp(), lai novērstu veco datu pārklāšanos.
       window.ethereum.on('chainChanged', () => {
-        setTimeout(() => updateChainStatus(), 100);
+        this.resetApp();
       });
     }
     
