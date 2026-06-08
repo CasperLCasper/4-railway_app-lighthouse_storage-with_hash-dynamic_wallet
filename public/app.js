@@ -18,8 +18,12 @@ import { apiFetch } from './modules/api.js';
 
 import { ADDON_STYLES } from './themes.js';
 
+// ✅ INTEGRĀCIJA: Importējam apkopes iestatījumus no atsevišķā faila
+import { MAINTENANCE_CONFIG } from './maintenance.js';
+
 const App = Object.assign({}, AppState, {
   setAddonStyle(styleName) {
+    if (MAINTENANCE_CONFIG.isMaintenance) return; // Drošība
     this.currentAddonStyle = styleName;
     
     const style = ADDON_STYLES[styleName];
@@ -69,8 +73,6 @@ const App = Object.assign({}, AppState, {
     
     updateChainStatus();
     
-    // ✅ LABOJUMS: Vecais, liekais un mulsinošais "Network changed" ziņojums no šejienes ir pilnībā IZGRIEZTS.
-    
     console.log("✅ App data cleared. Auth token preserved.");
   },
 
@@ -111,6 +113,11 @@ const App = Object.assign({}, AppState, {
   },
 
   async generateNFT() {
+    if (MAINTENANCE_CONFIG.isMaintenance) {
+      showToast('🛠️ Minting is disabled during maintenance.', 'warning');
+      return;
+    }
+
     if (!this.account || !this.provider || !this.signer) { 
       showToast('🔌 Please connect your wallet first', 'warning');
       return; 
@@ -122,7 +129,6 @@ const App = Object.assign({}, AppState, {
     try {
       await switchToMintChain();
       
-      // Mazs buferis, lai window.ethereum paspēj pārslēgties
       await new Promise(resolve => setTimeout(resolve, 400));
       
       this.provider = new ethers.BrowserProvider(window.ethereum);
@@ -152,7 +158,6 @@ const App = Object.assign({}, AppState, {
       
       showToast('📸 Creating your NFT assets...', 'info');
       
-      // 1. Izveido attēlu
       const imageBlob = await new Promise((resolve, reject) => {
         UI.canvas.toBlob((blob) => {
           if (blob) resolve(blob);
@@ -163,7 +168,6 @@ const App = Object.assign({}, AppState, {
       const imageFileName = `snapshot_${Date.now()}.png`;
       const imageFile = new File([imageBlob], imageFileName, { type: 'image/png' });
       
-      // 2. Ieraksta video
       let videoBlob = null;
       let videoFileName = null;
       let videoFile = null;
@@ -193,7 +197,6 @@ const App = Object.assign({}, AppState, {
         showToast('🎬 Video failed, continuing without video', 'warning');
       }
       
-      // 3. Sūta uz serveri
       showToast('📤 Processing on server...', 'info');
       
       const nftFormData = new FormData();
@@ -219,7 +222,6 @@ const App = Object.assign({}, AppState, {
       
       console.log('✅ Serveris apstrādāja:', serverData);
       
-      // 4. Izveido metadatus dinamiski
       const gw = LIGHTHOUSE_GATEWAY;
       const imageUrl = serverData.image.cid ? `${gw}${serverData.image.cid}` : `local://${serverData.image.hash}`;
       
@@ -247,7 +249,6 @@ const App = Object.assign({}, AppState, {
       const metadataBlob = new Blob([JSON.stringify(metadata, null, 2)], { type: 'application/json' });
       const metadataFileName = `metadata_${Date.now()}.json`;
       
-      // 5. Lejupielādē VISUS failus kā vienu ZIP
       showToast('💾 Saving all files as ZIP...', 'info');
       
       const allFiles = [
@@ -261,7 +262,6 @@ const App = Object.assign({}, AppState, {
       
       showToast('✅ All files saved as ZIP!', 'success');
       
-      // 6. Metadati uz Lighthouse
       let metadataCID = null;
       try {
         const metaRes = await uploadMetadataToIPFS(metadata);
@@ -272,7 +272,6 @@ const App = Object.assign({}, AppState, {
         showToast('⚠️ Metadata upload failed, continuing anyway', 'warning');
       }
       
-      // 7. Mint
       showToast('📝 Preparing mint...', 'info');
       
       let mintData;
@@ -330,6 +329,7 @@ const App = Object.assign({}, AppState, {
   },
 
   async renderSnapshot(chain) {
+    if (MAINTENANCE_CONFIG.isMaintenance) return;
     await renderSnapshot(this, chain);
   },
 
@@ -359,11 +359,51 @@ const App = Object.assign({}, AppState, {
     }
   },
 
+  // ✅ PALĪGFUNKCIJA: Canvas un interfeisa nobloķēšana vizuāli
+  renderMaintenanceScreen() {
+    stopAnimation(this);
+    if (this.ctx || UI.canvas) {
+      this.ctx = this.ctx || UI.canvas.getContext('2d');
+      this.ctx.fillStyle = '#000';
+      this.ctx.fillRect(0, 0, UI.canvas.width, UI.canvas.height);
+      
+      this.ctx.fillStyle = '#ff3333';
+      this.ctx.font = 'bold 28px Inter, sans-serif';
+      this.ctx.textAlign = 'center';
+      this.ctx.fillText(MAINTENANCE_CONFIG.title, UI.canvas.width / 2, UI.canvas.height / 2 - 15);
+      
+      this.ctx.fillStyle = '#aaa';
+      this.ctx.font = '16px Inter, sans-serif';
+      this.ctx.fillText(MAINTENANCE_CONFIG.subtitle, UI.canvas.width / 2, UI.canvas.height / 2 + 30);
+    }
+
+    if (UI.connectBtn) {
+      UI.connectBtn.disabled = true;
+      UI.connectBtn.textContent = '🛠️ Maintenance Active';
+    }
+    if (UI.renderBtn) UI.renderBtn.disabled = true;
+    if (UI.generateNFTBtn) UI.generateNFTBtn.disabled = true;
+    if (UI.recordBtn) UI.recordBtn.disabled = true;
+    if (UI.chainSelect) UI.chainSelect.disabled = true;
+  },
+
   init() {
     console.log("🚀 Starting Wallet Visualizer with Lighthouse Storage + ZIP Download...");
     initUI();
     resizeCanvas(this);
     
+    // ✅ LABOJUMS: Ja apkopes režīms ir ieslēgts, uzreiz aizslēdzam UI un pārtraucam parasto init procesu
+    if (MAINTENANCE_CONFIG.isMaintenance) {
+      console.warn("⚠️ Application initialization stopped: Maintenance Mode is active.");
+      this.renderMaintenanceScreen();
+      window.addEventListener('resize', () => {
+        resizeCanvas(this);
+        this.renderMaintenanceScreen();
+      });
+      showToast('🛠️ System is undergoing planned maintenance.', 'warning');
+      return; 
+    }
+
     window.addEventListener('auth:expired', () => {
       this.handleSessionExpired();
     });
@@ -386,7 +426,6 @@ const App = Object.assign({}, AppState, {
     UI.generateNFTBtn.addEventListener('click', () => this.generateNFT());
     UI.recordBtn.addEventListener('click', () => startRecording(this));
     
-    // ✅ LABOJUMS: Papildinām dropdown maiņas notikumu ar skaidru angļu valodas paziņojumu
     UI.chainSelect.addEventListener('change', async () => {
       if (this.account) {
         showToast(`You changed the network! Please reconnect wallet to switch to ${UI.chainSelect.value}`, 'info');
@@ -414,9 +453,6 @@ const App = Object.assign({}, AppState, {
       if (this.showInfo) updateTokenListUI(this.tokens); 
     });
 
-    // ============================================ //
-    // LOGA FUNKCIONALITĀTE (ABOUT MODAL)          //
-    // ============================================ //
     const modal = document.getElementById("aboutModal");
     const aboutBtn = document.getElementById("aboutBtn");
     const closeBtn = document.querySelector(".close-modal");
@@ -441,8 +477,6 @@ const App = Object.assign({}, AppState, {
     
     window.addEventListener('resize', () => resizeCanvas(this));
     
-    // ✅ LABOJUMS: Kad reāli makā (MetaMaskā) mainās tīkls, mēs tikai klusi iztīrām datus,
-    // lai tie nemaisās, un neizvadam nekādus liekus toastus. Lietotājs pats apzinās, ko tikko izdarīja makā.
     if (window.ethereum) {
       window.ethereum.on('chainChanged', () => {
         this.resetApp();
