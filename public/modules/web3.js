@@ -15,7 +15,6 @@ export async function updateChainStatus() {
     const selectedChainKey = UI.chainSelect ? UI.chainSelect.value : null;
     const selectedChain = VIZ_CHAINS[selectedChainKey];
     
-    // Tīra un loģiska pārbaude: ja izvēlētais tīkls eksistē un tā ID sakrīt ar maka ID
     if (selectedChain && chainIdHex && chainIdHex.toLowerCase() === selectedChain.chainIdHex.toLowerCase()) {
       UI.chainStatus.className = 'chain-status connected';
       UI.chainStatus.title = `✓ Connected to ${selectedChain.name}`;
@@ -70,15 +69,29 @@ export async function switchToVizChain(chainIdHex) {
       const chainConfig = Object.values(VIZ_CHAINS).find(
         c => c.chainIdHex && chainIdHex && c.chainIdHex.toLowerCase() === chainIdHex.toLowerCase()
       );
+      
       if (chainConfig) {
+        // ✅ STRATĒĢISKS LABOJUMS ENKRYPT MAKAM:
+        // Ja tīkls ir Polygon Amoy, mēs cieti nodefinējam oficiālos parametrus,
+        // ko pieprasa maka drošības sistēma, lai noņemtu brīdinājumu.
+        const isAmoy = chainConfig.chainIdHex.toLowerCase() === '0x13882';
+        
+        const currencySymbol = isAmoy ? 'POL' : (chainConfig.nativeCurrency || 'ETH');
+        const explorerUrl = isAmoy ? 'https://amoy.polygonscan.com/' : chainConfig.blockExplorer;
+        const rpcUrlsArray = isAmoy ? ['https://rpc-amoy.polygon.technology'] : (Array.isArray(chainConfig.rpc) ? chainConfig.rpc : [chainConfig.rpc]);
+
         await window.ethereum.request({
           method: 'wallet_addEthereumChain',
           params: [{
             chainId: chainConfig.chainIdHex,
-            chainName: chainConfig.name,
-            nativeCurrency: { name: chainConfig.nativeCurrency, symbol: chainConfig.nativeCurrency, decimals: 18 },
-            rpcUrls: Array.isArray(chainConfig.rpc) ? chainConfig.rpc : [chainConfig.rpc],
-            blockExplorerUrls: [chainConfig.blockExplorer]
+            chainName: isAmoy ? 'Polygon Amoy Testnet' : chainConfig.name,
+            nativeCurrency: { 
+              name: currencySymbol, 
+              symbol: currencySymbol, 
+              decimals: 18 
+            },
+            rpcUrls: rpcUrlsArray,
+            blockExplorerUrls: explorerUrl ? [explorerUrl] : []
           }]
         });
         await updateChainStatus();
@@ -174,7 +187,6 @@ export async function connectWallet(app) {
     UI.generateNFTBtn.setAttribute('data-price', price);
     
     await updateChainStatus();
-    
     await updateBalanceDisplay(account);
     
     const tokenCount = app.tokens.filter(t => !t.isNFT).length;
